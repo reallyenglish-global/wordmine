@@ -2,14 +2,16 @@
   "expo": {
     "name": "wordmine",
     "slug": "wordmine",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.reallyenglish.wordmine.prototype"
     },
     "android": {
+      "package": "com.reallyenglish.wordmine.prototype",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",

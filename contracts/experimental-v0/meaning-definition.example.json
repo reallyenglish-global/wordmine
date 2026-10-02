@@ -1,0 +1,15 @@
+{
+  "contract": "wordmine.prototype.meaning-definition.v0",
+  "contentVersion": "synthetic-1",
+  "activity": {
+    "id": "demo-meaning-1",
+    "kind": "meaning-from-definition",
+    "definition": "A small fictional object used only in this demonstration.",
+    "choices": [
+      { "id": "c1", "label": "sapphire" },
+      { "id": "c2", "label": "lumen" },
+      { "id": "c3", "label": "harbour" }
+    ],
+    "answerChoiceId": "c2"
+  }
+}

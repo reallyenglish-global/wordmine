@@ -1,0 +1,169 @@
+{
+  "$id": "https://github.com/reallyenglish-global/wordmine/contracts/experimental-v0/activity.schema.json",
+  "title": "WordMine experimental activity document (wordmine.activity.v0)",
+  "description": "Generated from src/contract/schema.ts by scripts/emit-schema.ts. Do not edit by hand. Cross-field rules (unique choice ids, answerKey matching the activity) are enforced by the TypeScript validator and the fixture corpus.",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "contract": {
+      "type": "string",
+      "const": "wordmine.activity.v0"
+    },
+    "contentVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "languages": {
+      "$ref": "#/$defs/Languages"
+    },
+    "activity": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MeaningFromDefinitionActivity"
+        }
+      ]
+    },
+    "answerKey": {
+      "$ref": "#/$defs/AnswerKey"
+    }
+  },
+  "required": [
+    "contract",
+    "contentVersion",
+    "languages",
+    "activity"
+  ],
+  "$defs": {
+    "Languages": {
+      "id": "Languages",
+      "description": "UI, target and explanation languages are separate by product requirement",
+      "type": "object",
+      "properties": {
+        "ui": {
+          "$ref": "#/$defs/LanguageTag"
+        },
+        "target": {
+          "$ref": "#/$defs/LanguageTag"
+        },
+        "explanation": {
+          "$ref": "#/$defs/LanguageTag"
+        }
+      },
+      "required": [
+        "ui",
+        "target",
+        "explanation"
+      ]
+    },
+    "LanguageTag": {
+      "id": "LanguageTag",
+      "description": "BCP 47 language tag",
+      "type": "string",
+      "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+    },
+    "MeaningFromDefinitionActivity": {
+      "id": "MeaningFromDefinitionActivity",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "const": "meaning-from-definition"
+        },
+        "instruction": {
+          "$ref": "#/$defs/LocalizedText"
+        },
+        "prompt": {
+          "$ref": "#/$defs/LocalizedText"
+        },
+        "choices": {
+          "minItems": 2,
+          "maxItems": 8,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Choice"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "prompt",
+        "choices"
+      ]
+    },
+    "LocalizedText": {
+      "id": "LocalizedText",
+      "description": "Learner-visible text with its language tag",
+      "type": "object",
+      "properties": {
+        "lang": {
+          "$ref": "#/$defs/LanguageTag"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "lang",
+        "text"
+      ]
+    },
+    "Choice": {
+      "id": "Choice",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "$ref": "#/$defs/LocalizedText"
+        }
+      },
+      "required": [
+        "id",
+        "label"
+      ]
+    },
+    "AnswerKey": {
+      "id": "AnswerKey",
+      "description": "Grading data for one activity; may be omitted from a prompt-only document",
+      "type": "object",
+      "properties": {
+        "activityId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "const": "meaning-from-definition"
+        },
+        "choiceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "feedback": {
+          "type": "object",
+          "properties": {
+            "correct": {
+              "$ref": "#/$defs/LocalizedText"
+            },
+            "incorrect": {
+              "$ref": "#/$defs/LocalizedText"
+            }
+          }
+        }
+      },
+      "required": [
+        "activityId",
+        "kind",
+        "choiceId"
+      ]
+    }
+  }
+}

@@ -4,21 +4,32 @@ Public **experimental** Expo/React Native shell for a WordMine Next activity-con
 
 ## Run and verify
 
-Use Node 22 and npm:
+Use Node 22 or newer (see `.nvmrc` and `engines`) and npm:
 
 ```sh
 npm ci
 npm run typecheck
 npm test
 npm run contract:check
+npm run contract:schema   # regenerate the JSON Schema after editing src/contract/schema.ts
 npm start
 ```
 
-GitHub Actions performs those contract checks on PRs and main. A separate job runs Expo Android prebuild and Gradle `assembleDebug` on an x86_64 Linux runner, then uploads a short-lived prototype APK and SHA-256 checksum. It is **not** a release-signed or QA/production build, has not had device testing, and should not be distributed as a product.
+GitHub Actions performs those contract checks on PRs and main. On pushes to main and manual dispatch only, a separate job runs Expo Android prebuild and Gradle `assembleDebug` on an x86_64 Linux runner, then uploads a short-lived prototype APK and SHA-256 checksum. It is **not** a release-signed or QA/production build, has not had device testing, and should not be distributed as a product.
 
 ## Contract boundary
 
-`contracts/experimental-v0/meaning-definition.example.json` defines a **local-only example** for meaning-from-definition. `src/contract.ts` validates structural shape, non-empty IDs/labels, unique choice IDs, a present answer, and rejects unknown choices. These checks do **not** prove WordMine exercise parity, scoring, scheduling, authenticated learner state, idempotent attempts, course reporting, Mandarin correctness, or an approved publication contract. Do not copy a production wordlist into this public repository without a separately reviewed release and rights decision.
+`contracts/experimental-v0/` holds a **local-only experimental** activity contract, `wordmine.activity.v0`:
+
+- `activity.schema.json` is a JSON Schema (draft 2020-12) generated from `src/contract/schema.ts` by `npm run contract:schema`. It is the language-neutral artifact other repositories can validate against; `npm run contract:check` fails if it drifts from the TypeScript source.
+- `fixtures/valid/` and `fixtures/invalid/` form the fixture corpus. Each invalid fixture names the field path it expects to fail on. Every fixture is checked by the tests and by `contract:check`; add fixtures rather than editing the scripts.
+- One versioned envelope carries `contentVersion`, separate `languages.ui`, `languages.target` and `languages.explanation` tags, an `activity` discriminated on `kind`, and an optional `answerKey`. Every learner-visible string is `{ lang, text }` with a BCP 47 tag.
+- The answer key is separate from the activity definition so a prompt-only document can be shipped. Grading goes through the `Grader` interface in `src/contract/grader.ts`; the bundled `LocalAnswerKeyGrader` returns an `ActivityOutcome` object, not a boolean.
+- Unknown fields are tolerated and stripped, so later versions can add fields without breaking v0 readers. Validation failures list every field-level issue.
+
+The app loads the fixture through a `ContentSource` seam (`src/content/`) and shows a readable error state if a document fails validation, instead of crashing at import.
+
+These checks do **not** prove WordMine exercise parity, scoring, scheduling, authenticated learner state, idempotent attempts, course reporting, Mandarin correctness, or an approved publication contract. The `zh-Hans` fixture only exercises language tags; it is not vocabulary content. Do not copy a production wordlist into this public repository without a separately reviewed release and rights decision.
 
 Before connecting to private services, independently review the [WM-NEXT epic](https://github.com/joeywang/re-work) and the pending Lexicon content and wm-api learning-contract draft PRs. Define one approved vertical contract with legacy behavior and sanitized fixtures, an additive versioned API and fallback, then verify it in wm-api, wm-lib and the mobile client. No client-side answer check here should be mistaken for authoritative course progress.
 

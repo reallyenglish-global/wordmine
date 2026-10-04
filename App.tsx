@@ -1,14 +1,15 @@
-import { useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, Pressable, View } from 'react-native';
+import { useMemo } from 'react';
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import example from './contracts/experimental-v0/meaning-definition.example.json';
-import { checkAnswer, parsePrototypeContract } from './src/contract';
-
-const { activity } = parsePrototypeContract(example);
+import synthetic from './contracts/experimental-v0/fixtures/valid/meaning-definition.synthetic.json';
+import { LocalAnswerKeyGrader } from './src/contract';
+import { BundledFixtureSource } from './src/content/source';
+import { useActivityDocument } from './src/content/useActivityDocument';
+import { MeaningActivityScreen } from './src/screens/MeaningActivityScreen';
 
 export default function App() {
-  const [selected, setSelected] = useState<string | null>(null);
-  const correct = selected === null ? null : checkAnswer(activity, selected);
+  const source = useMemo(() => new BundledFixtureSource(synthetic), []);
+  const state = useActivityDocument(source);
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -16,25 +17,28 @@ export default function App() {
         <Text style={styles.eyebrow}>WORDMINE · EXPERIMENTAL</Text>
         <Text style={styles.heading}>Meaning from definition</Text>
         <Text style={styles.note}>Synthetic offline example. No account, progress sync, or course reporting.</Text>
-        <View style={styles.card}>
-          <Text style={styles.label}>Choose the matching word</Text>
-          <Text style={styles.definition}>{activity.definition}</Text>
-          {activity.choices.map((choice) => (
-            <Pressable
-              key={choice.id}
-              accessibilityRole="button"
-              accessibilityLabel={`Choose ${choice.label}`}
-              onPress={() => setSelected(choice.id)}
-              style={[styles.choice, selected === choice.id && styles.selected]}
-            >
-              <Text style={styles.choiceText}>{choice.label}</Text>
-            </Pressable>
-          ))}
-          {correct !== null && <Text accessibilityRole="alert" style={styles.feedback}>
-            {correct ? 'Correct for this sample.' : 'Not this sample; try another choice.'}
-          </Text>}
-        </View>
-        <Text style={styles.footer}>Prototype contract v0 · not a WordMine production exercise</Text>
+        {state.status === 'loading' && <Text style={styles.note}>Loading activity…</Text>}
+        {state.status === 'error' && (
+          <View accessibilityRole="alert" style={styles.errorCard}>
+            <Text style={styles.errorTitle}>Could not load the activity</Text>
+            <Text style={styles.note}>{state.message}</Text>
+            {state.issues.map((issue) => (
+              <Text key={issue.path} style={styles.issue}>
+                {issue.path}: {issue.message}
+              </Text>
+            ))}
+          </View>
+        )}
+        {state.status === 'ready' && state.document.answerKey && (
+          <MeaningActivityScreen document={state.document} grader={new LocalAnswerKeyGrader(state.document.answerKey)} />
+        )}
+        {state.status === 'ready' && !state.document.answerKey && (
+          <View accessibilityRole="alert" style={styles.errorCard}>
+            <Text style={styles.errorTitle}>This document has no local answer key</Text>
+            <Text style={styles.note}>Prompt-only documents need a server-side grader, which this prototype does not have.</Text>
+          </View>
+        )}
+        <Text style={styles.footer}>Contract wordmine.activity.v0 · not a WordMine production exercise</Text>
       </ScrollView>
       <StatusBar style="light" />
     </SafeAreaView>
@@ -47,12 +51,8 @@ const styles = StyleSheet.create({
   eyebrow: { color: '#9dc9ff', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   heading: { color: '#f4f8ff', fontSize: 30, fontWeight: '700' },
   note: { color: '#b4c4d9', fontSize: 15, lineHeight: 23 },
-  card: { backgroundColor: '#21324a', borderRadius: 18, padding: 20, gap: 14 },
-  label: { color: '#a9c8eb', fontSize: 13, fontWeight: '600' },
-  definition: { color: '#fff', fontSize: 21, lineHeight: 29, marginBottom: 8 },
-  choice: { backgroundColor: '#344b67', borderRadius: 10, padding: 16 },
-  selected: { backgroundColor: '#276c8f' },
-  choiceText: { color: '#fff', fontSize: 17 },
-  feedback: { color: '#b9e6c4', fontSize: 15, marginTop: 10 },
+  errorCard: { backgroundColor: '#3d2e1f', borderRadius: 18, padding: 20, gap: 8, borderLeftWidth: 5, borderLeftColor: '#ffd6a5' },
+  errorTitle: { color: '#fff', fontSize: 18, fontWeight: '700' },
+  issue: { color: '#ffd6a5', fontSize: 13, fontFamily: 'monospace' },
   footer: { color: '#8ea8c6', fontSize: 12 },
 });

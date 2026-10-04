@@ -1,6 +1,7 @@
 {
-  "reason": "Answer key must belong to the activity",
+  "reason": "Answer key must belong to the activity (cross-field rule: TypeScript validator only, not expressible in JSON Schema)",
   "expectedPath": "answerKey.activityId",
+  "jsonSchemaDetects": false,
   "document": {
     "contract": "wordmine.activity.v0",
     "contentVersion": "synthetic-1",

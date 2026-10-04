@@ -3,7 +3,7 @@
   "expectedPath": "contentVersion",
   "document": {
     "contract": "wordmine.activity.v0",
-    "contentVersion": "  ",
+    "contentVersion": "",
     "languages": {
       "ui": "en",
       "target": "en",

@@ -1,6 +1,7 @@
 {
-  "reason": "Answer must be one of the choices",
+  "reason": "Answer must be one of the choices (cross-field rule: TypeScript validator only, not expressible in JSON Schema)",
   "expectedPath": "answerKey.choiceId",
+  "jsonSchemaDetects": false,
   "document": {
     "contract": "wordmine.activity.v0",
     "contentVersion": "synthetic-1",

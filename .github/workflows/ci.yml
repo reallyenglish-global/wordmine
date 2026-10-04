@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   contracts:
     runs-on: ubuntu-latest
@@ -17,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - run: npm run typecheck
@@ -64,7 +68,8 @@ jobs:
           CI: '1'
 
   android-prototype:
-    if: github.event_name != 'workflow_dispatch'
+    # PRs check contracts, the PWA and native bundles; dispatch runs release runtime checks.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: contracts
     runs-on: ubuntu-latest
     timeout-minutes: 50
@@ -72,7 +77,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version-file: .nvmrc
           cache: npm
       - uses: actions/setup-java@v4
         with:
@@ -81,6 +86,7 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           packages: platform-tools
+      - uses: gradle/actions/setup-gradle@v4
       - run: npm ci
       - name: Generate Android project from Expo config
         run: npx expo prebuild --platform android --no-install

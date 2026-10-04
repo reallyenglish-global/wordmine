@@ -1,0 +1,25 @@
+{
+  "contract": "wordmine.activity.v0",
+  "contentVersion": "synthetic-1",
+  "languages": { "ui": "zh-Hans", "target": "en", "explanation": "zh-Hans" },
+  "activity": {
+    "id": "demo-meaning-3",
+    "kind": "meaning-from-definition",
+    "instruction": { "lang": "zh-Hans", "text": "选择对应的单词" },
+    "prompt": { "lang": "zh-Hans", "text": "仅用于本演示的一个虚构小物件。" },
+    "choices": [
+      { "id": "c1", "label": { "lang": "en", "text": "sapphire" } },
+      { "id": "c2", "label": { "lang": "en", "text": "lumen" } },
+      { "id": "c3", "label": { "lang": "en", "text": "harbour" } }
+    ]
+  },
+  "answerKey": {
+    "activityId": "demo-meaning-3",
+    "kind": "meaning-from-definition",
+    "choiceId": "c2",
+    "feedback": {
+      "correct": { "lang": "zh-Hans", "text": "本示例回答正确。" },
+      "incorrect": { "lang": "zh-Hans", "text": "不是这个示例，请再试一次。" }
+    }
+  }
+}

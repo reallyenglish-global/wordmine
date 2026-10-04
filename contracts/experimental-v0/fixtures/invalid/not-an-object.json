@@ -1,0 +1,5 @@
+{
+  "reason": "Document must be an object",
+  "expectedPath": "(root)",
+  "document": "hello"
+}

@@ -3,7 +3,8 @@ import { join, resolve } from 'node:path';
 
 export const FIXTURE_ROOT = resolve('contracts/experimental-v0/fixtures');
 
-export type InvalidFixture = { name: string; reason: string; expectedPath: string; document: unknown };
+/** `jsonSchemaDetects` is false for cross-field rules that only the TypeScript validator enforces. */
+export type InvalidFixture = { name: string; reason: string; expectedPath: string; jsonSchemaDetects: boolean; document: unknown };
 
 function readJsonDir(dir: string): { name: string; value: unknown }[] {
   return readdirSync(dir)
@@ -22,6 +23,12 @@ export function loadInvalidFixtures(): InvalidFixture[] {
     if (typeof record.reason !== 'string' || typeof record.expectedPath !== 'string' || !('document' in record)) {
       throw new Error(`Invalid fixture ${name} must have reason, expectedPath and document`);
     }
-    return { name, reason: record.reason, expectedPath: record.expectedPath, document: record.document };
+    return {
+      name,
+      reason: record.reason,
+      expectedPath: record.expectedPath,
+      jsonSchemaDetects: record.jsonSchemaDetects !== false,
+      document: record.document,
+    };
   });
 }

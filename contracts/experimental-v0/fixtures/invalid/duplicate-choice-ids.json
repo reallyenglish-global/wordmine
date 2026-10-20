@@ -1,6 +1,7 @@
 {
-  "reason": "Choice ids must be unique",
+  "reason": "Choice ids must be unique (cross-field rule: TypeScript validator only, not expressible in JSON Schema)",
   "expectedPath": "activity.choices.1.id",
+  "jsonSchemaDetects": false,
   "document": {
     "contract": "wordmine.activity.v0",
     "contentVersion": "synthetic-1",

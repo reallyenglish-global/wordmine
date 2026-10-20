@@ -11,6 +11,11 @@ export function buildJsonSchema(): Record<string, unknown> {
     io: 'input',
     unrepresentable: 'any',
   });
+  // zod copies its registry metadata `id` into each definition; it is not a JSON Schema keyword and
+  // strict validators such as Ajv reject it, so drop it (the definition name already carries it).
+  for (const definition of Object.values((schema.$defs ?? {}) as Record<string, Record<string, unknown>>)) {
+    delete definition.id;
+  }
   return {
     $id: `https://github.com/reallyenglish-global/wordmine/${JSON_SCHEMA_PATH}`,
     title: `WordMine experimental activity document (${CONTRACT_ID})`,

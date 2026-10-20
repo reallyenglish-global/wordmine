@@ -1,0 +1,410 @@
+appId: com.reallyenglish.wordmine.prototype
+name: Local study, persistence, completion and restart
+---
+- launchApp:
+    clearState: true
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Start practice"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn:
+    text: "Start practice"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Card 1 of 6"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- assertVisible:
+    text: "Card 1 of 6"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Choose glimmer"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn:
+    text: "Choose glimmer"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Correct\\."
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- assertVisible:
+    text: "Correct\\."
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Next card"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn:
+    text: "Next card"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Your spelling"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn: "Your spelling"
+- inputText: "glimmer"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Check spelling"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn:
+    text: "Check spelling"
+- extendedWaitUntil:
+    visible: "Correct\\."
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Saved on this device"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- assertVisible:
+    text: "Saved on this device"
+- stopApp
+- launchApp
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Resume practice"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn:
+    text: "Resume practice"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Card 2 of 6"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- assertVisible:
+    text: "Card 2 of 6"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Correct\\."
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- assertVisible:
+    text: "Correct\\."
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Next card"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn:
+    text: "Next card"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Choose wander"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn:
+    text: "Choose wander"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Not quite\\. Answer: shelter"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- assertVisible:
+    text: "Not quite\\. Answer: shelter"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Next card"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn:
+    text: "Next card"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Your spelling"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn: "Your spelling"
+- inputText: "shelter"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Check spelling"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn:
+    text: "Check spelling"
+- extendedWaitUntil:
+    visible: "Correct\\."
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Correct\\."
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- assertVisible:
+    text: "Correct\\."
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Next card"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn:
+    text: "Next card"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Choose wander"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn:
+    text: "Choose wander"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Correct\\."
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- assertVisible:
+    text: "Correct\\."
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Next card"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn:
+    text: "Next card"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Your spelling"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn: "Your spelling"
+- inputText: "wander"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Check spelling"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn:
+    text: "Check spelling"
+- extendedWaitUntil:
+    visible: "Correct\\."
+    timeout: 10000
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Correct\\."
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- assertVisible:
+    text: "Correct\\."
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Finish practice"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn:
+    text: "Finish practice"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "5 of 6 correct"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- assertVisible:
+    text: "5 of 6 correct"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Practice complete"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- assertVisible:
+    text: "Practice complete"
+- takeScreenshot: native-results/study-complete
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Practice again"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- tapOn:
+    text: "Practice again"
+- scrollUntilVisible:
+    element:
+      text: "wordmine"
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Card 1 of 6"
+    direction: DOWN
+    timeout: 20000
+    centerElement: true
+- assertVisible:
+    text: "Card 1 of 6"

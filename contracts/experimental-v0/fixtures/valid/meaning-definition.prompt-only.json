@@ -1,0 +1,14 @@
+{
+  "contract": "wordmine.activity.v0",
+  "contentVersion": "synthetic-1",
+  "languages": { "ui": "en", "target": "en", "explanation": "en" },
+  "activity": {
+    "id": "demo-meaning-2",
+    "kind": "meaning-from-definition",
+    "prompt": { "lang": "en", "text": "A second fictional object, shipped without its answer key." },
+    "choices": [
+      { "id": "a", "label": { "lang": "en", "text": "quillet" } },
+      { "id": "b", "label": { "lang": "en", "text": "brindle" } }
+    ]
+  }
+}

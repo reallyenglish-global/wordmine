@@ -1,0 +1,63 @@
+{
+  "reason": "Answer key must belong to the activity",
+  "expectedPath": "answerKey.activityId",
+  "document": {
+    "contract": "wordmine.activity.v0",
+    "contentVersion": "synthetic-1",
+    "languages": {
+      "ui": "en",
+      "target": "en",
+      "explanation": "en"
+    },
+    "activity": {
+      "id": "demo-meaning-1",
+      "kind": "meaning-from-definition",
+      "instruction": {
+        "lang": "en",
+        "text": "Choose the matching word"
+      },
+      "prompt": {
+        "lang": "en",
+        "text": "A small fictional object used only in this demonstration."
+      },
+      "choices": [
+        {
+          "id": "c1",
+          "label": {
+            "lang": "en",
+            "text": "sapphire"
+          }
+        },
+        {
+          "id": "c2",
+          "label": {
+            "lang": "en",
+            "text": "lumen"
+          }
+        },
+        {
+          "id": "c3",
+          "label": {
+            "lang": "en",
+            "text": "harbour"
+          }
+        }
+      ]
+    },
+    "answerKey": {
+      "activityId": "other",
+      "kind": "meaning-from-definition",
+      "choiceId": "c2",
+      "feedback": {
+        "correct": {
+          "lang": "en",
+          "text": "Correct for this sample."
+        },
+        "incorrect": {
+          "lang": "en",
+          "text": "Not this sample; try another choice."
+        }
+      }
+    }
+  }
+}

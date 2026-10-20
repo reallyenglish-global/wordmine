@@ -24,6 +24,45 @@ jobs:
       - run: npm test
       - run: npm run contract:check
 
+  web-pwa:
+    needs: contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build:web
+      - name: Exercise study, persistence and offline reload in Chromium
+        run: npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wordmine-web-acceptance-${{ github.sha }}
+          path: test-results/
+          if-no-files-found: warn
+          retention-days: 7
+
+  native-bundles:
+    needs: contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Check Android and iOS production JS and Hermes bundling (not device tests)
+        run: npx expo export --platform android --platform ios --output-dir dist-native
+        env:
+          CI: '1'
+
   android-prototype:
     needs: contracts
     runs-on: ubuntu-latest

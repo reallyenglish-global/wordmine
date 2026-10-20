@@ -35,7 +35,6 @@
   ],
   "$defs": {
     "Languages": {
-      "id": "Languages",
       "description": "UI, target and explanation languages are separate by product requirement",
       "type": "object",
       "properties": {
@@ -56,13 +55,11 @@
       ]
     },
     "LanguageTag": {
-      "id": "LanguageTag",
       "description": "BCP 47 language tag",
       "type": "string",
       "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
     },
     "MeaningFromDefinitionActivity": {
-      "id": "MeaningFromDefinitionActivity",
       "type": "object",
       "properties": {
         "id": {
@@ -96,7 +93,6 @@
       ]
     },
     "LocalizedText": {
-      "id": "LocalizedText",
       "description": "Learner-visible text with its language tag",
       "type": "object",
       "properties": {
@@ -114,7 +110,6 @@
       ]
     },
     "Choice": {
-      "id": "Choice",
       "type": "object",
       "properties": {
         "id": {
@@ -131,7 +126,6 @@
       ]
     },
     "AnswerKey": {
-      "id": "AnswerKey",
       "description": "Grading data for one activity; may be omitted from a prompt-only document",
       "type": "object",
       "properties": {

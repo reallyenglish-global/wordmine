@@ -15,7 +15,7 @@ npm run contract:schema   # regenerate the JSON Schema after editing src/contrac
 npm start
 ```
 
-GitHub Actions performs those contract checks on PRs and main. On pushes to main and manual dispatch only, a separate job runs Expo Android prebuild and Gradle `assembleDebug` on an x86_64 Linux runner, then uploads a short-lived prototype APK and SHA-256 checksum. It is **not** a release-signed or QA/production build, has not had device testing, and should not be distributed as a product.
+GitHub Actions performs contract, browser/PWA and native-bundle checks on PRs and main. On pushes to main only, a separate job runs Expo Android prebuild and Gradle `assembleDebug` on an x86_64 Linux runner, then uploads a short-lived prototype APK and SHA-256 checksum. Manual dispatch retains the separate Android release runtime acceptance jobs. It is **not** a release-signed or QA/production build, has not had device testing, and should not be distributed as a product.
 
 ## Modern local study slice
 
@@ -74,7 +74,7 @@ worker on a shared authenticated app origin without a new scope/cache review.
 - The answer key is separate from the activity definition so a prompt-only document can be shipped. Grading goes through the `Grader` interface in `src/contract/grader.ts`; the bundled `LocalAnswerKeyGrader` returns an `ActivityOutcome` object, not a boolean.
 - Unknown fields are tolerated and stripped, so later versions can add fields without breaking v0 readers. Validation failures list every field-level issue.
 
-The app loads the fixture through a `ContentSource` seam (`src/content/`) and shows a readable error state if a document fails validation, instead of crashing at import.
+The home screen's **Explore contract demo** opens the separate schema-backed fixture preview without replacing the local study flow. The preview loads the fixture through a `ContentSource` seam (`src/content/`) and shows a readable error state if a document fails validation, instead of crashing at import. Selecting a choice does not grade it until **Check answer** is pressed; **Back to study** returns to the local pack.
 
 These checks do **not** prove WordMine exercise parity, scoring, scheduling, authenticated learner state, idempotent attempts, course reporting, Mandarin correctness, or an approved publication contract. The `zh-Hans` fixture only exercises language tags; it is not vocabulary content. Do not copy a production wordlist into this public repository without a separately reviewed release and rights decision.
 

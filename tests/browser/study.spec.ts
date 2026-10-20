@@ -1,0 +1,38 @@
+import { test, expect } from '@playwright/test';
+
+test('synthetic pack supports choice, typed recall, reload resume and local-only completion', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Start practice' }).click();
+  await expect(page.getByText('Card 1 of 6', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Choose glimmer' }).click();
+  await expect(page.getByText('Correct.', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Next card' }).click();
+  await page.getByRole('textbox', { name: 'Your spelling' }).fill(' GLIMMER ');
+  await page.getByRole('button', { name: 'Check spelling' }).click();
+  await expect(page.getByText('Saved on this device', { exact: true })).toBeVisible();
+  await page.reload();
+  await page.getByRole('button', { name: 'Resume practice' }).click();
+  await expect(page.getByText('Card 2 of 6', { exact: true })).toBeVisible();
+  await expect(page.getByText('Correct.', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Next card' }).click();
+  await page.getByRole('button', { name: 'Choose wander' }).click();
+  await expect(page.getByText('Not quite. Answer: shelter', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Next card' }).click();
+  await page.getByRole('textbox', { name: 'Your spelling' }).fill('shelter');
+  await page.getByRole('button', { name: 'Check spelling' }).click();
+  await page.getByRole('button', { name: 'Next card' }).click();
+  await page.getByRole('button', { name: 'Choose wander' }).click();
+  await page.getByRole('button', { name: 'Next card' }).click();
+  await page.getByRole('textbox', { name: 'Your spelling' }).fill('wander');
+  await page.getByRole('button', { name: 'Check spelling' }).click();
+  await page.getByRole('button', { name: 'Finish practice' }).click();
+  await expect(page.getByText('Practice complete', { exact: true })).toBeVisible();
+  await expect(page.getByText('5 of 6 correct', { exact: true })).toBeVisible();
+  await expect(page.getByText('Practice on this device only. No course reporting or mastery claim.')).toBeVisible();
+  await page.getByRole('button', { name: 'Practice again' }).click();
+  await expect(page.getByText('Card 1 of 6', { exact: true })).toBeVisible();
+  await page.screenshot({ path: 'test-results/wm-next-mobile-web.png', fullPage: true });
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await expect(page.getByText('Card 1 of 6', { exact: true })).toBeVisible();
+  await page.screenshot({ path: 'test-results/wm-next-desktop-web.png', fullPage: true });
+});

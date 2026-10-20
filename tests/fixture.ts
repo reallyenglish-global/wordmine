@@ -1,0 +1,9 @@
+export const fixture = {
+  schema: 'wordmine.local-pack.v0', id: 'synthetic-en', version: '1', language: 'en',
+  title: 'A little light', provenance: 'Original synthetic practice examples; not a production wordlist.',
+  entries: [
+    { id: 'glimmer', word: 'glimmer', senses: [{ id: 'glimmer-light', definition: 'A small, gentle light.' }] },
+    { id: 'shelter', word: 'shelter', senses: [{ id: 'shelter-place', definition: 'A place that protects you from bad weather.' }] },
+    { id: 'wander', word: 'wander', senses: [{ id: 'wander-walk', definition: 'To walk without a fixed destination.' }] },
+  ],
+};

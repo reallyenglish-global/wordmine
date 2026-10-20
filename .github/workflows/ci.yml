@@ -28,9 +28,48 @@ jobs:
       - run: npm test
       - run: npm run contract:check
 
+  web-pwa:
+    needs: contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build:web
+      - name: Exercise study, persistence and offline reload in Chromium
+        run: npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wordmine-web-acceptance-${{ github.sha }}
+          path: test-results/
+          if-no-files-found: warn
+          retention-days: 7
+
+  native-bundles:
+    needs: contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Check Android and iOS production JS and Hermes bundling (not device tests)
+        run: npx expo export --platform android --platform ios --output-dir dist-native
+        env:
+          CI: '1'
+
   android-prototype:
-    # The debug APK is a 40 to 50 minute build; pull requests only need the contract job.
-    if: github.event_name != 'pull_request'
+    # PRs check contracts, the PWA and native bundles; dispatch runs release runtime checks.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: contracts
     runs-on: ubuntu-latest
     timeout-minutes: 50
@@ -64,5 +103,128 @@ jobs:
           path: |
             android/app/build/outputs/apk/debug/app-debug.apk
             wordmine-prototype.sha256
+          if-no-files-found: error
+          retention-days: 7
+
+  # Manual, exact-feature-ref acceptance only. No signing secrets, publishing,
+  # deployment, backend access or expression-derived shell inputs are used.
+  native-android-build:
+    if: github.event_name == 'workflow_dispatch'
+    needs: contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      CI: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - run: npm ci
+      - run: npx expo prebuild --platform android --no-install
+      - name: Compile standalone non-debug x86_64 emulator APK
+        working-directory: android
+        # Expo's generated prototype release uses the disposable debug signing
+        # key. This is non-debug runtime verification, NOT distribution signing.
+        run: ./gradlew :app:assembleRelease -PreactNativeArchitectures=x86_64 --no-daemon
+      - name: Record artifact provenance
+        run: |
+          mkdir -p native-results
+          cp android/app/build/outputs/apk/release/app-release.apk native-results/wordmine-emulator.apk
+          sha256sum native-results/wordmine-emulator.apk > native-results/android.sha256
+          git rev-parse HEAD > native-results/source-sha.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wordmine-android-emulator-${{ github.sha }}
+          path: native-results/
+          if-no-files-found: error
+          retention-days: 7
+
+  native-android-runtime:
+    if: github.event_name == 'workflow_dispatch'
+    needs: native-android-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      MAESTRO_CLI_NO_ANALYTICS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/download-artifact@v4
+        with:
+          name: wordmine-android-emulator-${{ github.sha }}
+          path: native-results/
+      - run: sha256sum --check native-results/android.sha256
+      - run: bash scripts/ci/install-maestro.sh
+      - name: Enable KVM for the disposable hosted emulator
+        run: |
+          sudo chmod 666 /dev/kvm
+      - name: Install and exercise the same APK without Metro
+        uses: ReactiveCircus/android-emulator-runner@4c44018e59b437e86cdfc41da381398f93ed8808 # v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          script: bash scripts/ci/android-runtime.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wordmine-android-runtime-${{ github.sha }}
+          overwrite: true
+          path: native-results/
+          if-no-files-found: error
+          retention-days: 7
+
+  native-ios-simulator:
+    if: github.event_name == 'workflow_dispatch'
+    needs: contracts
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      CI: '1'
+      DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
+      MAESTRO_CLI_NO_ANALYTICS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - run: npm ci
+      - run: npx expo prebuild --platform ios --no-install
+      - name: Install simulator Pods
+        working-directory: ios
+        run: pod install
+      - run: bash scripts/ci/install-maestro.sh
+      - name: Compile, install and exercise unsigned Release simulator app
+        run: bash scripts/ci/ios-simulator.sh
+      - name: Record exact source revision
+        if: always()
+        run: |
+          mkdir -p native-results
+          git rev-parse HEAD > native-results/source-sha.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wordmine-ios-simulator-${{ github.sha }}
+          overwrite: true
+          path: native-results/
           if-no-files-found: error
           retention-days: 7

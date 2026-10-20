@@ -45,7 +45,7 @@ function StudyApp() {
     </Pressable>
   );
   return <SafeAreaView style={styles.screen}>
-    <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+    <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
       <View style={styles.content}>
         <View style={styles.header}><Text style={styles.brand}>wordmine</Text><Text style={styles.tag}>NEXT · LOCAL PREVIEW</Text></View>
         <Text style={styles.eyebrow}>A LITTLE PRACTICE. A WIDER WORLD.</Text>

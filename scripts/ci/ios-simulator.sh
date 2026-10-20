@@ -16,6 +16,16 @@ PY
 )
 xcrun simctl boot "$udid"
 xcrun simctl bootstatus "$udid" -b
+# Preserve failure evidence as well as successful runtime screenshots.
+capture_simulator() {
+  status=$?
+  trap - EXIT
+  if ! xcrun simctl io "$udid" screenshot native-results/ios-after-flow.png; then
+    printf 'Could not capture simulator screenshot\n' >&2
+  fi
+  exit "$status"
+}
+trap capture_simulator EXIT
 workspaces=(ios/*.xcworkspace)
 test "${#workspaces[@]}" -eq 1
 xcodebuild -list -json -workspace "${workspaces[0]}" > native-results/schemes.json
@@ -39,4 +49,3 @@ ditto -c -k --sequesterRsrc --keepParent "${apps[0]}" native-results/wordmine-io
 shasum -a 256 native-results/wordmine-ios-simulator.zip > native-results/ios-simulator.sha256
 MAESTRO_CLI_NO_ANALYTICS=1 maestro --device "$udid" test --format junit \
   --output native-results/ios-runtime.xml --debug-output native-results/maestro .maestro/study.yaml
-xcrun simctl io "$udid" screenshot native-results/ios-complete.png

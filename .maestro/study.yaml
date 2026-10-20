@@ -81,7 +81,8 @@ name: Local study, persistence, completion and restart
     centerElement: true
 - tapOn: "Your spelling"
 - inputText: "glimmer"
-- hideKeyboard
+- swipe:
+    direction: DOWN
 - scrollUntilVisible:
     element:
       text: "wordmine"
@@ -217,7 +218,8 @@ name: Local study, persistence, completion and restart
     centerElement: true
 - tapOn: "Your spelling"
 - inputText: "shelter"
-- hideKeyboard
+- swipe:
+    direction: DOWN
 - scrollUntilVisible:
     element:
       text: "wordmine"
@@ -312,7 +314,8 @@ name: Local study, persistence, completion and restart
     centerElement: true
 - tapOn: "Your spelling"
 - inputText: "wander"
-- hideKeyboard
+- swipe:
+    direction: DOWN
 - scrollUntilVisible:
     element:
       text: "wordmine"

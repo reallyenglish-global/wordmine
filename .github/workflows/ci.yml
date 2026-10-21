@@ -95,13 +95,18 @@ jobs:
       - name: Compile non-debug preview APK (prototype identity; not store-signed)
         working-directory: android
         run: ./gradlew :app:assembleRelease --no-daemon
+      - name: Sign preview APK with a disposable CI-only key
+        run: |
+          keytool -genkeypair -v -keystore "$RUNNER_TEMP/wordmine-preview.jks" -storepass preview-only -keypass preview-only -alias preview -keyalg RSA -keysize 2048 -validity 2 -dname "CN=WordMine Preview, OU=CI, O=WordMine, C=GB"
+          apksigner sign --ks "$RUNNER_TEMP/wordmine-preview.jks" --ks-pass pass:preview-only --key-pass pass:preview-only --out "$RUNNER_TEMP/wordmine-preview-signed.apk" android/app/build/outputs/apk/release/app-release.apk
+          apksigner verify --verbose "$RUNNER_TEMP/wordmine-preview-signed.apk"
       - name: Record preview provenance
         run: |
           mkdir -p preview
-          cp android/app/build/outputs/apk/release/app-release.apk preview/wordmine-preview.apk
+          cp "$RUNNER_TEMP/wordmine-preview-signed.apk" preview/wordmine-preview.apk
           sha256sum preview/wordmine-preview.apk > preview/sha256.txt
           git rev-parse HEAD > preview/source-sha.txt
-          node -e 'const c=require("./app.json").expo; const m=require("./android/app/build.gradle").match(/applicationId "([^"]+)"/); require("fs").writeFileSync("preview/build-metadata.json", JSON.stringify({applicationId:m?.[1]??c.android.package, version:c.version, androidVersionCode:c.android?.versionCode??null, variant:"release", signing:"disposable prototype key; preview only"},null,2)+"\n")'
+          node -e 'const c=require("./app.json").expo; require("fs").writeFileSync("preview/build-metadata.json", JSON.stringify({applicationId:c.android.package, version:c.version, androidVersionCode:c.android.versionCode??null, variant:"release", signing:"disposable CI-only preview key; not for store updates"},null,2)+"\n")'
       - uses: actions/upload-artifact@v4
         with:
           name: wordmine-preview-${{ github.sha }}

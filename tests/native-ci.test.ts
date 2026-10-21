@@ -6,6 +6,14 @@ import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 // These are shell control-flow tests with fake tools, NOT native runtime tests.
+test('shared native entrypoint includes package grading, relaunch and original-state assertions', () => {
+  const study = readFileSync('.maestro/study.yaml','utf8');
+  assert.ok(/runFlow: package\.yaml/.test(study),'Shared native entrypoint must execute package.yaml');
+  const flow = readFileSync('.maestro/package.yaml','utf8');
+  for (const expected of ['clearState: true','Choose harbor','HARBOUR','stopApp','Package card 2 of 6','Check rejection example','Resume practice','package-original-preserved'])
+    assert.ok(flow.includes(expected),`Native package flow missing ${expected}`);
+  assert.match(flow,/helpers\/reveal\.yaml/);
+});
 for (const [label, install, maestro, diagnostics, expected] of [
   ['success', 0, 0, 0, 0],
   ['failed flow', 0, 7, 0, 7],

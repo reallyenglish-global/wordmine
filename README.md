@@ -76,13 +76,20 @@ worker on a shared authenticated app origin without a new scope/cache review.
 
 ```sh
 npx tsx scripts/bundle-package.ts --check
+# Check or regenerate static validators after intentionally changing the package schema:
+npx tsx scripts/generate-package-validators.ts --check
+npx tsx scripts/generate-package-validators.ts
 # Regenerate the bundle after intentionally changing fixture bytes/checksums:
 npx tsx scripts/bundle-package.ts
 # Optional reproducibility check; requires Python with Unicode 16.0.0:
 python3 scripts/generate-casefold.py --check
 ```
 
-Unit tests guard exact fixture-to-bundle byte equality. Browser tests exercise package completion, alternate spelling, rejection, reload/offline resume, denied/corrupt storage and preservation of original practice. The preview shows the first list and validates—but does not render—assets. SHA-256 integrity is not authentication. Media decoding, ZIP extraction, downloads, untrusted packages, signatures, large-pack performance and native package runtime/device acceptance remain outside this slice. Ajv currently compiles trusted schema code at module load; a strict CSP without dynamic code generation is not supported by this preview.
+Unit tests guard exact fixture-to-bundle byte equality. Browser tests exercise package completion, alternate spelling, rejection, reload/offline resume, denied/corrupt storage and preservation of original practice. The preview shows the first list and validates—but does not render—assets. SHA-256 integrity is not authentication. Media decoding, ZIP extraction, downloads, untrusted packages, signatures and large-pack performance remain outside this slice.
+
+WM-PACK-02 replaces import-time Ajv compilation with checked-in static validators. `npm test` guards deterministic regeneration (including a deliberately stale-file rejection) and reruns the full package corpus with Node's `--disallow-code-generation-from-strings`. A browser test exercises real practice under a CSP without `unsafe-eval`, including an external-script negative control proving string code generation is blocked. The test allows inline bootstrap/styles; it is **not** a fully hardened production CSP or a deployment header change. Ajv is still a runtime dependency for small static validation helpers, not its compiler.
+
+The existing manual Android/iOS acceptance entrypoint now also runs `.maestro/package.yaml`: synthetic meaning/spelling, explicit alternate spelling, cold relaunch persistence, invalid-candidate rejection and preservation of original study progress. Local YAML/control-flow checks are not native runtime proof; require an exact-head hosted acceptance run before claiming emulator/device support. Native compilation uses the existing disposable, non-store Release artifacts; no signing/distribution or deployment is added.
 
 ## Contract boundary
 

@@ -1,0 +1,173 @@
+appId: com.reallyenglish.wordmine.prototype
+name: Synthetic package grading, cold relaunch and isolated original progress
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: wordmine
+      TARGET: Start practice
+- tapOn:
+    text: Start practice
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: wordmine
+      TARGET: Choose glimmer
+- tapOn:
+    text: Choose glimmer
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: wordmine
+      TARGET: Saved on this device
+- assertVisible:
+    text: Saved on this device
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: wordmine
+      TARGET: Back to packs
+- tapOn:
+    text: Back to packs
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: wordmine
+      TARGET: Explore package demo
+- tapOn:
+    text: Explore package demo
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: WORDMINE.*PACKAGE PREVIEW
+      TARGET: Package card 1 of 6
+- assertVisible:
+    text: Package card 1 of 6
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: WORDMINE.*PACKAGE PREVIEW
+      TARGET: Choose harbor
+- tapOn:
+    text: Choose harbor
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: WORDMINE.*PACKAGE PREVIEW
+      TARGET: Correct\.
+- assertVisible:
+    text: Correct\.
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: WORDMINE.*PACKAGE PREVIEW
+      TARGET: Next package card
+- tapOn:
+    text: Next package card
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: WORDMINE.*PACKAGE PREVIEW
+      TARGET: Package spelling
+- tapOn:
+    text: Package spelling
+- inputText: HARBOUR
+- hideKeyboard
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: WORDMINE.*PACKAGE PREVIEW
+      TARGET: Check package spelling
+- tapOn:
+    text: Check package spelling
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: WORDMINE.*PACKAGE PREVIEW
+      TARGET: Correct\.
+- assertVisible:
+    text: Correct\.
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: WORDMINE.*PACKAGE PREVIEW
+      TARGET: Package saved on this device
+- assertVisible:
+    text: Package saved on this device
+- takeScreenshot: native-results/package-before-relaunch
+- stopApp
+- launchApp
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: wordmine
+      TARGET: Explore package demo
+- tapOn:
+    text: Explore package demo
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: WORDMINE.*PACKAGE PREVIEW
+      TARGET: Package card 2 of 6
+- assertVisible:
+    text: Package card 2 of 6
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: WORDMINE.*PACKAGE PREVIEW
+      TARGET: Correct\.
+- assertVisible:
+    text: Correct\.
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: WORDMINE.*PACKAGE PREVIEW
+      TARGET: Check rejection example
+- tapOn:
+    text: Check rejection example
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: WORDMINE.*PACKAGE PREVIEW
+      TARGET: Invalid package rejected\. Current practice unchanged\.
+- assertVisible:
+    text: Invalid package rejected\. Current practice unchanged\.
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: WORDMINE.*PACKAGE PREVIEW
+      TARGET: Package card 2 of 6
+- assertVisible:
+    text: Package card 2 of 6
+- takeScreenshot: native-results/package-after-relaunch
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: WORDMINE.*PACKAGE PREVIEW
+      TARGET: Back to study
+- tapOn:
+    text: Back to study
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: wordmine
+      TARGET: Resume practice
+- tapOn:
+    text: Resume practice
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: wordmine
+      TARGET: Card 1 of 6
+- assertVisible:
+    text: Card 1 of 6
+- runFlow:
+    file: helpers/reveal.yaml
+    env:
+      ANCHOR: wordmine
+      TARGET: Correct\.
+- assertVisible:
+    text: Correct\.
+- takeScreenshot: native-results/package-original-preserved

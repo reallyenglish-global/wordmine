@@ -1,0 +1,14 @@
+appId: com.reallyenglish.wordmine.prototype
+name: Reveal a known element from a stable screen anchor
+---
+- scrollUntilVisible:
+    element:
+      text: ${ANCHOR}
+    direction: UP
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: ${TARGET}
+    direction: DOWN
+    timeout: 20000
+    centerElement: true

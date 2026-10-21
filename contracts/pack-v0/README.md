@@ -35,6 +35,12 @@ Closed structures deliberately catch typos and learner-data leakage. Additions n
 
 `en-nfc-trim-casefold-v1` uses NFC, Unicode **16.0.0** whitespace trimming and full casefold, exact comparison after normalization. Preserve accents, punctuation and internal spaces. Do not replace it with JavaScript lowercasing, legacy accent folding or a Mandarin approximation. The generated mapping includes Unicode License V3. Python generation requires Unicode 16.0.0; no Python is needed to run the app.
 
+## Static validators and native acceptance
+
+The app imports `src/package/validators.generated.ts`, not the Ajv compiler. Generate/review these functions at build time with `npx tsx scripts/generate-package-validators.ts`; `--check` rejects stale output. Default unit tests rerun the full package/evaluator/session corpus with string code generation disabled, and browser tests exercise practice under a no-`unsafe-eval` CSP with an external-script negative control. Schema and semantic rules are unchanged. Ajv's static helper modules remain runtime dependencies; inline bootstrap/styles are allowed by the test policy, so this is not a full CSP hardening claim.
+
+The existing manually dispatched native acceptance scripts run `.maestro/study.yaml`, which now includes `.maestro/package.yaml` after the original flow. The package flow checks recognition, alternate spelling, cold relaunch, rejected candidates and original-state isolation. Host YAML/control-flow tests are not an emulator result; acceptance evidence must pin the actual hosted run/head and distinguish real runtime failures from skipped jobs.
+
 ## Verification
 
 ```sh

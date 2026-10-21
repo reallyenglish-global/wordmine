@@ -408,3 +408,4 @@ name: Local study, persistence, completion and restart
     centerElement: true
 - assertVisible:
     text: "Card 1 of 6"
+- runFlow: package.yaml

@@ -1,5 +1,4 @@
-import Ajv from 'ajv/dist/2020';
-import schema from '../../contracts/pack-v0/package.schema.json';
+import * as generatedValidators from './validators.generated';
 import { parseActivityDocument } from '../contract/parse';
 import type { ActivityDocument, LocalizedText } from '../contract/schema';
 import { hashBytes, parseJson, requireValid as check } from './bytes';
@@ -19,10 +18,7 @@ export type PackageCard = {
 };
 export type ContentPackage = {manifest: Manifest; manifestHash: string; lists: List[]; words: Word[]; cards: PackageCard[]};
 
-const ajv = new Ajv({strict: true, allErrors: false});
-ajv.addSchema(schema);
-const validators = Object.fromEntries(['manifest','lists','words','questions','answers'].map(role =>
-  [role, ajv.compile({$ref: `${schema.$id}#/$defs/${role}`})]));
+const validators = generatedValidators as Record<string,(value:unknown)=>boolean>;
 function structural(value: unknown, role: string) {
   check(validators[role](value), `invalid ${role} schema`); // Never include raw document data in errors.
 }

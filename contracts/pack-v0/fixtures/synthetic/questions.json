@@ -1,0 +1,117 @@
+{
+  "contract": "wordmine.questions.v0",
+  "contentVersion": "0.1.0",
+  "items": [
+    {
+      "wordId": "word.harbor",
+      "senseId": "sense.harbor.1",
+      "promptField": "definition",
+      "id": "question.harbor.meaning",
+      "kind": "meaning-from-definition",
+      "choices": [
+        {
+          "id": "choice.harbor",
+          "label": {
+            "lang": "en",
+            "text": "harbor"
+          }
+        },
+        {
+          "id": "choice.lantern",
+          "label": {
+            "lang": "en",
+            "text": "lantern"
+          }
+        },
+        {
+          "id": "choice.meadow",
+          "label": {
+            "lang": "en",
+            "text": "meadow"
+          }
+        }
+      ]
+    },
+    {
+      "wordId": "word.harbor",
+      "senseId": "sense.harbor.1",
+      "promptField": "definition",
+      "id": "question.harbor.spelling",
+      "kind": "spelling-from-definition"
+    },
+    {
+      "wordId": "word.lantern",
+      "senseId": "sense.lantern.1",
+      "promptField": "definition",
+      "id": "question.lantern.meaning",
+      "kind": "meaning-from-definition",
+      "choices": [
+        {
+          "id": "choice.harbor",
+          "label": {
+            "lang": "en",
+            "text": "harbor"
+          }
+        },
+        {
+          "id": "choice.lantern",
+          "label": {
+            "lang": "en",
+            "text": "lantern"
+          }
+        },
+        {
+          "id": "choice.meadow",
+          "label": {
+            "lang": "en",
+            "text": "meadow"
+          }
+        }
+      ]
+    },
+    {
+      "wordId": "word.lantern",
+      "senseId": "sense.lantern.1",
+      "promptField": "definition",
+      "id": "question.lantern.spelling",
+      "kind": "spelling-from-definition"
+    },
+    {
+      "wordId": "word.meadow",
+      "senseId": "sense.meadow.1",
+      "promptField": "definition",
+      "id": "question.meadow.meaning",
+      "kind": "meaning-from-definition",
+      "choices": [
+        {
+          "id": "choice.harbor",
+          "label": {
+            "lang": "en",
+            "text": "harbor"
+          }
+        },
+        {
+          "id": "choice.lantern",
+          "label": {
+            "lang": "en",
+            "text": "lantern"
+          }
+        },
+        {
+          "id": "choice.meadow",
+          "label": {
+            "lang": "en",
+            "text": "meadow"
+          }
+        }
+      ]
+    },
+    {
+      "wordId": "word.meadow",
+      "senseId": "sense.meadow.1",
+      "promptField": "definition",
+      "id": "question.meadow.spelling",
+      "kind": "spelling-from-definition"
+    }
+  ]
+}

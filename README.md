@@ -1,6 +1,6 @@
 # WordMine Next — local-first React Native preview
 
-Public **experimental** Expo/React Native shell for a WordMine Next activity-contract exploration. The repository currently uses a **synthetic** word and definition; it contains no ReallyEnglish wordlist, private wm-api/wm-lib implementation, course data, answer keys, tokens, or learner data. It is not a deployed product.
+Public **experimental** Expo/React Native shell for a WordMine Next activity-contract exploration. The repository uses original **synthetic** content and practice answer keys only; it contains no ReallyEnglish wordlist, private wm-api/wm-lib implementation, production answer keys, course data, tokens, or learner data. It is not a deployed product.
 
 ## Run and verify
 
@@ -63,6 +63,26 @@ worker on a shared authenticated app origin without a new scope/cache review.
   Android prototype APK job is retained. No claim of green remote CI is made until
   publication is authorized and those jobs actually run. iOS Xcode/device CI is a
   later separately reviewed slice.
+
+## Synthetic package reader (WM-PACK-01)
+
+**Explore package demo** opens a second bundled synthetic pack through `wordmine.package.v0`, without replacing the original local pack or its saved session. See [package format and limits](contracts/pack-v0/README.md).
+
+- Manifest + ordered lists + words/senses + question parameters + separate practice keys + assets are validated from exact local bytes before any content is returned.
+- Two capabilities: definition-to-meaning choice and definition-to-spelling. Reusable sense references generate cards; the meaning adapter also emits the existing `wordmine.activity.v0` envelope.
+- Full Unicode 16.0.0 NFC/trim/casefold spelling policy, with explicitly authored alternatives (e.g. `harbor` / `harbour`). This is not legacy accent folding or Mandarin grading. The pinned mapping and whitespace set are generated from Python's Unicode 16 tables; the Unicode notice is included at `src/package/UNICODE_LICENSE.txt`.
+- First answers are locked; completion, reload and offline resume use a separate storage namespace pinned to package ID, content version, manifest SHA-256 and list ID. Denied storage remains visibly temporary. No migration or overwrite of `wm-next:study:*` occurs.
+- **Check rejection example** corrupts a synthetic candidate and demonstrates failed validation without altering current practice. This is not a general import UI or installer.
+
+```sh
+npx tsx scripts/bundle-package.ts --check
+# Regenerate the bundle after intentionally changing fixture bytes/checksums:
+npx tsx scripts/bundle-package.ts
+# Optional reproducibility check; requires Python with Unicode 16.0.0:
+python3 scripts/generate-casefold.py --check
+```
+
+Unit tests guard exact fixture-to-bundle byte equality. Browser tests exercise package completion, alternate spelling, rejection, reload/offline resume, denied/corrupt storage and preservation of original practice. The preview shows the first list and validates—but does not render—assets. SHA-256 integrity is not authentication. Media decoding, ZIP extraction, downloads, untrusted packages, signatures, large-pack performance and native package runtime/device acceptance remain outside this slice. Ajv currently compiles trusted schema code at module load; a strict CSP without dynamic code generation is not supported by this preview.
 
 ## Contract boundary
 

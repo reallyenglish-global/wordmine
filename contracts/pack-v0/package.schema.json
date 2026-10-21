@@ -1,0 +1,901 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:wordmine:package:v0:proposal",
+  "$ref": "#/$defs/manifest",
+  "title": "WM-NEXT offline practice package v0 \u2014 design proposal, not an adopted API",
+  "$defs": {
+    "text": {
+      "type": "object",
+      "properties": {
+        "lang": {
+          "type": "string",
+          "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S",
+          "not": {
+            "pattern": "[<>]"
+          }
+        }
+      },
+      "required": [
+        "lang",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "rights": {
+      "type": "object",
+      "properties": {
+        "license": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "attribution": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "reviewStatus": {
+          "enum": [
+            "synthetic-design-fixture",
+            "approved-for-distribution"
+          ]
+        }
+      },
+      "required": [
+        "license",
+        "attribution",
+        "source",
+        "reviewStatus"
+      ],
+      "additionalProperties": false
+    },
+    "legacyWord": {
+      "type": "object",
+      "properties": {
+        "lexiconWordId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "vmsId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "wmWordId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "lexiconWordId"
+      ],
+      "additionalProperties": false
+    },
+    "calibration": {
+      "type": "object",
+      "properties": {
+        "parameter": {
+          "enum": [
+            "difficulty",
+            "discrimination"
+          ]
+        },
+        "value": {
+          "type": "number"
+        },
+        "population": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "sourceLanguage": {
+          "type": "string",
+          "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "validation": {
+          "enum": [
+            "unvalidated",
+            "validated-for-population"
+          ]
+        }
+      },
+      "required": [
+        "parameter",
+        "value",
+        "population",
+        "sourceLanguage",
+        "method",
+        "revision",
+        "validation"
+      ],
+      "additionalProperties": false
+    },
+    "example": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+        },
+        "role": {
+          "enum": [
+            "practice",
+            "progress",
+            "final"
+          ]
+        },
+        "text": {
+          "$ref": "#/$defs/text"
+        },
+        "audioAssetId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+        }
+      },
+      "required": [
+        "id",
+        "role",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "sense": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+        },
+        "partOfSpeech": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "definition": {
+          "$ref": "#/$defs/text"
+        },
+        "shortDefinition": {
+          "$ref": "#/$defs/text"
+        },
+        "translations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "minItems": 0
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/example"
+          },
+          "minItems": 0
+        },
+        "synonyms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "minItems": 0
+        },
+        "collocations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "minItems": 0
+        },
+        "hints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "minItems": 0
+        },
+        "imageAssetIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "definition",
+        "translations",
+        "examples"
+      ],
+      "additionalProperties": false
+    },
+    "word": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+        },
+        "headword": {
+          "$ref": "#/$defs/text"
+        },
+        "legacy": {
+          "$ref": "#/$defs/legacyWord"
+        },
+        "forms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "alternative-spelling",
+                  "inflection",
+                  "transliteration"
+                ]
+              },
+              "value": {
+                "$ref": "#/$defs/text"
+              }
+            },
+            "required": [
+              "kind",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "pronunciation": {
+          "type": "object",
+          "properties": {
+            "notation": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "audioAssetId": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+            }
+          },
+          "required": [
+            "notation",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        "features": {
+          "type": "object",
+          "properties": {
+            "grammar": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "minItems": 0
+            },
+            "prefixes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "minItems": 0
+            },
+            "suffixes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "minItems": 0
+            },
+            "syllables": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "minItems": 0
+            },
+            "stressPatterns": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "minItems": 0
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "minItems": 0
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "genre": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "topic": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "subTopic": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            },
+            "required": [
+              "genre"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "diagnosticNumber": {
+          "type": "integer"
+        },
+        "importance": {
+          "type": "integer"
+        },
+        "homographNumber": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "minItems": 0
+        },
+        "calibration": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/calibration"
+          },
+          "minItems": 0
+        },
+        "senses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sense"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "headword",
+        "senses"
+      ],
+      "additionalProperties": false
+    },
+    "list": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "legacy": {
+          "type": "object",
+          "properties": {
+            "lexiconListId": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "vendor": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "hasDiagnosticTest": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "lexiconListId",
+            "vendor",
+            "hasDiagnosticTest"
+          ],
+          "additionalProperties": false
+        },
+        "wordIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "wordIds"
+      ],
+      "additionalProperties": false
+    },
+    "choiceQuestion": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+        },
+        "wordId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+        },
+        "senseId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+        },
+        "promptField": {
+          "const": "definition"
+        },
+        "kind": {
+          "const": "meaning-from-definition"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+              },
+              "label": {
+                "$ref": "#/$defs/text"
+              }
+            },
+            "required": [
+              "id",
+              "label"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 2,
+          "maxItems": 8
+        }
+      },
+      "required": [
+        "id",
+        "wordId",
+        "senseId",
+        "promptField",
+        "kind",
+        "choices"
+      ],
+      "additionalProperties": false
+    },
+    "textQuestion": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+        },
+        "wordId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+        },
+        "senseId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+        },
+        "promptField": {
+          "const": "definition"
+        },
+        "kind": {
+          "const": "spelling-from-definition"
+        }
+      },
+      "required": [
+        "id",
+        "wordId",
+        "senseId",
+        "promptField",
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "question": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/choiceQuestion"
+        },
+        {
+          "$ref": "#/$defs/textQuestion"
+        }
+      ]
+    },
+    "answer": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "questionId": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "meaning-from-definition"
+            },
+            "choiceId": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+            }
+          },
+          "required": [
+            "questionId",
+            "kind",
+            "choiceId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "questionId": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+            },
+            "kind": {
+              "const": "spelling-from-definition"
+            },
+            "accepted": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "normalization": {
+              "const": "en-nfc-trim-casefold-v1"
+            }
+          },
+          "required": [
+            "questionId",
+            "kind",
+            "accepted",
+            "normalization"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "lists": {
+      "type": "object",
+      "properties": {
+        "contract": {
+          "const": "wordmine.lists.v0"
+        },
+        "contentVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/list"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "contract",
+        "contentVersion",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "words": {
+      "type": "object",
+      "properties": {
+        "contract": {
+          "const": "wordmine.words.v0"
+        },
+        "contentVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/word"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "contract",
+        "contentVersion",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "questions": {
+      "type": "object",
+      "properties": {
+        "contract": {
+          "const": "wordmine.questions.v0"
+        },
+        "contentVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/question"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "contract",
+        "contentVersion",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "answers": {
+      "type": "object",
+      "properties": {
+        "contract": {
+          "const": "wordmine.answers.v0"
+        },
+        "contentVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/answer"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "contract",
+        "contentVersion",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "file": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/documentFile"
+        },
+        {
+          "$ref": "#/$defs/assetFile"
+        }
+      ]
+    },
+    "manifest": {
+      "type": "object",
+      "properties": {
+        "contract": {
+          "const": "wordmine.package.v0"
+        },
+        "packageId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+        },
+        "contentVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "languages": {
+          "type": "object",
+          "properties": {
+            "target": {
+              "type": "string",
+              "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+            },
+            "explanation": {
+              "type": "string",
+              "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+            }
+          },
+          "required": [
+            "target",
+            "explanation"
+          ],
+          "additionalProperties": false
+        },
+        "purpose": {
+          "const": "offline-practice"
+        },
+        "rights": {
+          "$ref": "#/$defs/rights"
+        },
+        "requiredCapabilities": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "meaning-from-definition@1",
+              "spelling-from-definition@1"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/file"
+          },
+          "minItems": 4
+        }
+      },
+      "required": [
+        "contract",
+        "packageId",
+        "contentVersion",
+        "title",
+        "languages",
+        "purpose",
+        "rights",
+        "requiredCapabilities",
+        "files"
+      ],
+      "additionalProperties": false
+    },
+    "documentFile": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "enum": [
+            "lists",
+            "words",
+            "questions",
+            "answers"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "maxLength": 200,
+          "pattern": "^(?:[a-z0-9][a-z0-9_-]*/)*[a-z0-9][a-z0-9._-]*$",
+          "not": {
+            "pattern": "(?:^|/)\\.{1,2}(?:/|$)"
+          }
+        },
+        "mediaType": {
+          "const": "application/json"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "role",
+        "path",
+        "mediaType",
+        "bytes",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "assetFile": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "const": "asset"
+        },
+        "path": {
+          "type": "string",
+          "maxLength": 200,
+          "pattern": "^(?:[a-z0-9][a-z0-9_-]*/)*[a-z0-9][a-z0-9._-]*$",
+          "not": {
+            "pattern": "(?:^|/)\\.{1,2}(?:/|$)"
+          }
+        },
+        "mediaType": {
+          "enum": [
+            "image/png",
+            "image/jpeg",
+            "audio/mpeg",
+            "audio/wav"
+          ]
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "assetId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9._:-]{0,127}$"
+        },
+        "rights": {
+          "$ref": "#/$defs/rights"
+        }
+      },
+      "required": [
+        "role",
+        "path",
+        "mediaType",
+        "bytes",
+        "sha256",
+        "assetId",
+        "rights"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

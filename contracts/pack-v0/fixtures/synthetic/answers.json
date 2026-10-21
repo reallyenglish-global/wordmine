@@ -1,0 +1,46 @@
+{
+  "contract": "wordmine.answers.v0",
+  "contentVersion": "0.1.0",
+  "items": [
+    {
+      "questionId": "question.harbor.meaning",
+      "kind": "meaning-from-definition",
+      "choiceId": "choice.harbor"
+    },
+    {
+      "questionId": "question.harbor.spelling",
+      "kind": "spelling-from-definition",
+      "accepted": [
+        "harbor",
+        "harbour"
+      ],
+      "normalization": "en-nfc-trim-casefold-v1"
+    },
+    {
+      "questionId": "question.lantern.meaning",
+      "kind": "meaning-from-definition",
+      "choiceId": "choice.lantern"
+    },
+    {
+      "questionId": "question.lantern.spelling",
+      "kind": "spelling-from-definition",
+      "accepted": [
+        "lantern"
+      ],
+      "normalization": "en-nfc-trim-casefold-v1"
+    },
+    {
+      "questionId": "question.meadow.meaning",
+      "kind": "meaning-from-definition",
+      "choiceId": "choice.meadow"
+    },
+    {
+      "questionId": "question.meadow.spelling",
+      "kind": "spelling-from-definition",
+      "accepted": [
+        "meadow"
+      ],
+      "normalization": "en-nfc-trim-casefold-v1"
+    }
+  ]
+}

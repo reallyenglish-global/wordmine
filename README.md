@@ -54,15 +54,9 @@ worker on a shared authenticated app origin without a new scope/cache review.
 
 - Web/PWA: exercised locally in Chromium, narrow and desktop layouts. Install UI,
   Safari/iOS home-screen behavior and cache-upgrade lifecycle still need testing.
-- Android/iOS: Metro production **JavaScript** export passes on the ARM dev host
-  with `--no-bytecode`. The bundled Linux Hermes compiler is x86-64; normal bytecode
-  export fails here. This flag is a debugging verification workaround, not a release
-  configuration. Native compilation, emulator/device persistence and iOS signing
-  remain unverified in this slice.
-- CI changes add browser/PWA acceptance and full native bundle checks; the existing
-  Android prototype APK job is retained. No claim of green remote CI is made until
-  publication is authorized and those jobs actually run. iOS Xcode/device CI is a
-  later separately reviewed slice.
+- CI now builds a revision-labelled non-debug Android preview APK on PR and manual runs; it is a disposable preview build using generated prototype signing, not a store-signed artifact. The `android-preview` job publishes the APK, SHA-256, source SHA and build metadata for seven days; it does not publish to a release, store, public endpoint, or bucket. The existing main-branch debug-prototype APK behavior is unchanged.
+- Manual workflow dispatch downloads and checksum-verifies that exact preview APK before Android emulator acceptance; the iOS simulator remains a separate build. Preview emulator acceptance does not imply physical-device, store-signing or publication readiness.
+- iOS Xcode/device CI, physical-device checks, signing and store distribution remain separate gates. `npm run release:readiness` reports preview/store readiness from supplied JSON; a passing synthetic candidate does not approve real identity, content rights, privacy, signing, or publication.
 
 ## Synthetic package reader (WM-PACK-01)
 

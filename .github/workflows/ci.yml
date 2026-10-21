@@ -67,8 +67,50 @@ jobs:
         env:
           CI: '1'
 
+  android-preview:
+    # Non-debug preview artifact for PR/manual acceptance; no signing secrets or upload destination.
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    needs: contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      CI: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm ci
+      - name: Generate Android project from Expo config
+        run: npx expo prebuild --platform android --no-install
+      - name: Compile non-debug preview APK (prototype identity; not store-signed)
+        working-directory: android
+        run: ./gradlew :app:assembleRelease --no-daemon
+      - name: Record preview provenance
+        run: |
+          mkdir -p preview
+          cp android/app/build/outputs/apk/release/app-release.apk preview/wordmine-preview.apk
+          sha256sum preview/wordmine-preview.apk > preview/sha256.txt
+          git rev-parse HEAD > preview/source-sha.txt
+          node -e 'const c=require("./app.json").expo; const m=require("./android/app/build.gradle").match(/applicationId "([^"]+)"/); require("fs").writeFileSync("preview/build-metadata.json", JSON.stringify({applicationId:m?.[1]??c.android.package, version:c.version, androidVersionCode:c.android?.versionCode??null, variant:"release", signing:"disposable prototype key; preview only"},null,2)+"\n")'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wordmine-preview-${{ github.sha }}
+          path: preview/
+          if-no-files-found: error
+          retention-days: 7
+
   android-prototype:
-    # PRs check contracts, the PWA and native bundles; dispatch runs release runtime checks.
+    # Preserve the existing main-branch debug-prototype behavior.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: contracts
     runs-on: ubuntu-latest
@@ -106,51 +148,10 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  # Manual, exact-feature-ref acceptance only. No signing secrets, publishing,
-  # deployment, backend access or expression-derived shell inputs are used.
-  native-android-build:
-    if: github.event_name == 'workflow_dispatch'
-    needs: contracts
-    runs-on: ubuntu-latest
-    timeout-minutes: 50
-    env:
-      CI: '1'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-      - uses: android-actions/setup-android@v3
-        with:
-          packages: platform-tools
-      - run: npm ci
-      - run: npx expo prebuild --platform android --no-install
-      - name: Compile standalone non-debug x86_64 emulator APK
-        working-directory: android
-        # Expo's generated prototype release uses the disposable debug signing
-        # key. This is non-debug runtime verification, NOT distribution signing.
-        run: ./gradlew :app:assembleRelease -PreactNativeArchitectures=x86_64 --no-daemon
-      - name: Record artifact provenance
-        run: |
-          mkdir -p native-results
-          cp android/app/build/outputs/apk/release/app-release.apk native-results/wordmine-emulator.apk
-          sha256sum native-results/wordmine-emulator.apk > native-results/android.sha256
-          git rev-parse HEAD > native-results/source-sha.txt
-      - uses: actions/upload-artifact@v4
-        with:
-          name: wordmine-android-emulator-${{ github.sha }}
-          path: native-results/
-          if-no-files-found: error
-          retention-days: 7
-
   native-android-runtime:
+    # Manual acceptance installs the exact checksum-verified preview artifact.
     if: github.event_name == 'workflow_dispatch'
-    needs: native-android-build
+    needs: android-preview
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
@@ -163,14 +164,20 @@ jobs:
           java-version: '17'
       - uses: actions/download-artifact@v4
         with:
-          name: wordmine-android-emulator-${{ github.sha }}
-          path: native-results/
-      - run: sha256sum --check native-results/android.sha256
+          name: wordmine-preview-${{ github.sha }}
+          path: preview/
+      - name: Verify preview checksum and stage emulator input
+        run: |
+          sha256sum --check preview/sha256.txt
+          mkdir -p native-results
+          cp preview/wordmine-preview.apk native-results/wordmine-emulator.apk
+          cp preview/sha256.txt native-results/android.sha256
+          cp preview/source-sha.txt native-results/source-sha.txt
       - run: bash scripts/ci/install-maestro.sh
       - name: Enable KVM for the disposable hosted emulator
         run: |
           sudo chmod 666 /dev/kvm
-      - name: Install and exercise the same APK without Metro
+      - name: Install and exercise the exact preview APK without Metro
         uses: ReactiveCircus/android-emulator-runner@4c44018e59b437e86cdfc41da381398f93ed8808 # v2
         with:
           api-level: 34

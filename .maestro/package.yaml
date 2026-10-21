@@ -3,6 +3,7 @@ name: Synthetic package grading, cold relaunch and isolated original progress
 ---
 - launchApp:
     clearState: true
+- runFlow: helpers/study-home-ready.yaml
 - runFlow:
     file: helpers/reveal.yaml
     env:
@@ -99,6 +100,7 @@ name: Synthetic package grading, cold relaunch and isolated original progress
 - takeScreenshot: native-results/package-before-relaunch
 - stopApp
 - launchApp
+- runFlow: helpers/study-home-ready.yaml
 - runFlow:
     file: helpers/reveal.yaml
     env:

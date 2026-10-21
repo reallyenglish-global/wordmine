@@ -6,6 +6,15 @@ import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 // These are shell control-flow tests with fake tools, NOT native runtime tests.
+test('startup readiness handles only the observed external launcher dialog with one bounded retry', () => {
+  for (const name of ['study','package'])
+    assert.ok(readFileSync(`.maestro/${name}.yaml`,'utf8').includes('helpers/study-home-ready.yaml'));
+  const helper = readFileSync('.maestro/helpers/study-home-ready.yaml','utf8');
+  for (const text of ['platform: Android',"Pixel Launcher isn't responding",'Close app','maxRetries: 1','scrollUntilVisible'])
+    assert.ok(helper.includes(text),`Startup guard missing ${text}`);
+  for (const forbidden of ['optional: true','Choose ','Check spelling','inputText','launchApp'])
+    assert.ok(!helper.includes(forbidden),`Startup retry must not encompass practice actions: ${forbidden}`);
+});
 test('spelling flows dismiss iOS keyboards through a safe target without weakening Android checks', () => {
   for (const name of ['study','package'])
     assert.ok(readFileSync(`.maestro/${name}.yaml`,'utf8').includes('runFlow: helpers/dismiss-spelling-keyboard.yaml'));

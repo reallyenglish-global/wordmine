@@ -3,11 +3,7 @@ name: Local study, persistence, completion and restart
 ---
 - launchApp:
     clearState: true
-- scrollUntilVisible:
-    element:
-      text: "wordmine"
-    direction: UP
-    timeout: 20000
+- runFlow: helpers/study-home-ready.yaml
 - scrollUntilVisible:
     element:
       text: "Start practice"
@@ -113,11 +109,7 @@ name: Local study, persistence, completion and restart
     text: "Saved on this device"
 - stopApp
 - launchApp
-- scrollUntilVisible:
-    element:
-      text: "wordmine"
-    direction: UP
-    timeout: 20000
+- runFlow: helpers/study-home-ready.yaml
 - scrollUntilVisible:
     element:
       text: "Resume practice"

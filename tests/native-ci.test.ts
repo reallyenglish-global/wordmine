@@ -6,6 +6,14 @@ import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 // These are shell control-flow tests with fake tools, NOT native runtime tests.
+test('spelling flows dismiss iOS keyboards through a safe target without weakening Android checks', () => {
+  for (const name of ['study','package'])
+    assert.ok(readFileSync(`.maestro/${name}.yaml`,'utf8').includes('runFlow: helpers/dismiss-spelling-keyboard.yaml'));
+  const helper = readFileSync('.maestro/helpers/dismiss-spelling-keyboard.yaml','utf8');
+  assert.ok(helper.includes('platform: iOS') && helper.includes('Spell the word from its meaning'));
+  assert.ok(helper.includes('platform: Android') && helper.includes('hideKeyboard'));
+  assert.ok(!helper.includes('optional: true'),'Dismissal must not silently skip a failed interaction');
+});
 test('shared native entrypoint includes package grading, relaunch and original-state assertions', () => {
   const study = readFileSync('.maestro/study.yaml','utf8');
   assert.ok(/runFlow: package\.yaml/.test(study),'Shared native entrypoint must execute package.yaml');

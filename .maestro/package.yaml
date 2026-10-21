@@ -74,7 +74,7 @@ name: Synthetic package grading, cold relaunch and isolated original progress
 - tapOn:
     text: Package spelling
 - inputText: HARBOUR
-- hideKeyboard
+- runFlow: helpers/dismiss-spelling-keyboard.yaml
 - runFlow:
     file: helpers/reveal.yaml
     env:

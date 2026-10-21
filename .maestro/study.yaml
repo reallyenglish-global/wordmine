@@ -81,7 +81,7 @@ name: Local study, persistence, completion and restart
     centerElement: true
 - tapOn: "Your spelling"
 - inputText: "glimmer"
-- hideKeyboard
+- runFlow: helpers/dismiss-spelling-keyboard.yaml
 - scrollUntilVisible:
     element:
       text: "wordmine"
@@ -217,7 +217,7 @@ name: Local study, persistence, completion and restart
     centerElement: true
 - tapOn: "Your spelling"
 - inputText: "shelter"
-- hideKeyboard
+- runFlow: helpers/dismiss-spelling-keyboard.yaml
 - scrollUntilVisible:
     element:
       text: "wordmine"
@@ -312,7 +312,7 @@ name: Local study, persistence, completion and restart
     centerElement: true
 - tapOn: "Your spelling"
 - inputText: "wander"
-- hideKeyboard
+- runFlow: helpers/dismiss-spelling-keyboard.yaml
 - scrollUntilVisible:
     element:
       text: "wordmine"

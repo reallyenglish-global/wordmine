@@ -5,7 +5,7 @@ set -uo pipefail
 mkdir -p native-results
 if adb install -r native-results/wordmine-emulator.apk; then
   maestro test --format junit --output native-results/android-runtime.xml \
-    --debug-output native-results/maestro .maestro/study.yaml
+    --debug-output native-results/maestro --test-output-dir native-results/maestro .maestro/study.yaml
   rc=$?
 else
   rc=$?

@@ -1,5 +1,38 @@
 import {test,expect} from '@playwright/test';
 
+test('package practice works under a CSP that blocks eval and Function', async ({page}) => {
+  const errors:string[] = [];
+  page.on('pageerror',error => errors.push(error.message));
+  await page.route('**/*',async route => {
+    if (route.request().url().endsWith('/csp-negative-control.js')) return route.fulfill({
+      contentType:'application/javascript',
+      // Literal negative-control code only: never interpolate user input here.
+      body:"try {new Function('return 1')();document.body.dataset.codegenBlocked='no';} catch {document.body.dataset.codegenBlocked='yes';}",
+    });
+    if (!route.request().isNavigationRequest()) return route.continue();
+    const response = await route.fetch();
+    await route.fulfill({response,headers:{...response.headers(),
+      'content-security-policy':"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; base-uri 'self'"}});
+  });
+  const response = await page.goto('/');
+  expect(response!.headers()['content-security-policy']).not.toContain("'unsafe-eval'");
+  await page.getByRole('button',{name:'Explore package demo',exact:true}).click();
+  await page.getByRole('button',{name:'Choose harbor',exact:true}).click();
+  await expect(page.getByText('Correct.',{exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Next package card',exact:true}).click();
+  await page.getByRole('textbox',{name:'Package spelling',exact:true}).fill('HARBOUR');
+  await page.getByRole('button',{name:'Check package spelling',exact:true}).click();
+  await expect(page.getByText('Correct.',{exact:true})).toBeVisible();
+  expect(errors).toEqual([]);
+  // Negative control: an actual page script, rather than DevTools eval, must be blocked.
+  await page.evaluate(() => {
+    const script = document.createElement('script');
+    script.src = '/csp-negative-control.js';
+    document.body.appendChild(script);
+  });
+  await expect(page.locator('body')).toHaveAttribute('data-codegen-blocked','yes');
+});
+
 test('package cards, alternative spelling, rejection, resume and completion preserve old practice', async ({page}) => {
   await page.goto('/');
   await page.getByRole('button',{name:'Start practice',exact:true}).click();

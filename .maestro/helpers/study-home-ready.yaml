@@ -1,0 +1,23 @@
+appId: com.reallyenglish.wordmine.prototype
+name: Strict home readiness with a narrowly scoped external launcher recovery
+---
+# Android's first-boot Pixel Launcher ANR can cover an already-rendered app.
+# Retry readiness only once if the dialog appears during the first probe.
+# Never dismiss an unknown or WordMine ANR; never retry grading/persistence.
+- retry:
+    maxRetries: 1
+    commands:
+      - runFlow:
+          when:
+            platform: Android
+            visible: "Pixel Launcher isn't responding"
+          commands:
+            - tapOn:
+                text: "Close app"
+            - assertNotVisible:
+                text: "Pixel Launcher isn't responding"
+      - scrollUntilVisible:
+          element:
+            text: "wordmine"
+          direction: UP
+          timeout: 20000

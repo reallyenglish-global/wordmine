@@ -1,0 +1,16 @@
+appId: com.reallyenglish.wordmine.prototype
+name: Dismiss spelling keyboard without iOS heuristic swipe failures
+---
+# Maestro recommends tapping a noninteractive element when iOS swipe dismissal fails.
+# Both practice screens intentionally use this caption and keyboardShouldPersistTaps=handled.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          text: "Spell the word from its meaning"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard

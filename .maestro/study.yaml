@@ -3,11 +3,7 @@ name: Local study, persistence, completion and restart
 ---
 - launchApp:
     clearState: true
-- scrollUntilVisible:
-    element:
-      text: "wordmine"
-    direction: UP
-    timeout: 20000
+- runFlow: helpers/study-home-ready.yaml
 - scrollUntilVisible:
     element:
       text: "Start practice"
@@ -81,7 +77,7 @@ name: Local study, persistence, completion and restart
     centerElement: true
 - tapOn: "Your spelling"
 - inputText: "glimmer"
-- hideKeyboard
+- runFlow: helpers/dismiss-spelling-keyboard.yaml
 - scrollUntilVisible:
     element:
       text: "wordmine"
@@ -113,11 +109,7 @@ name: Local study, persistence, completion and restart
     text: "Saved on this device"
 - stopApp
 - launchApp
-- scrollUntilVisible:
-    element:
-      text: "wordmine"
-    direction: UP
-    timeout: 20000
+- runFlow: helpers/study-home-ready.yaml
 - scrollUntilVisible:
     element:
       text: "Resume practice"
@@ -217,7 +209,7 @@ name: Local study, persistence, completion and restart
     centerElement: true
 - tapOn: "Your spelling"
 - inputText: "shelter"
-- hideKeyboard
+- runFlow: helpers/dismiss-spelling-keyboard.yaml
 - scrollUntilVisible:
     element:
       text: "wordmine"
@@ -312,7 +304,7 @@ name: Local study, persistence, completion and restart
     centerElement: true
 - tapOn: "Your spelling"
 - inputText: "wander"
-- hideKeyboard
+- runFlow: helpers/dismiss-spelling-keyboard.yaml
 - scrollUntilVisible:
     element:
       text: "wordmine"
@@ -408,3 +400,4 @@ name: Local study, persistence, completion and restart
     centerElement: true
 - assertVisible:
     text: "Card 1 of 6"
+- runFlow: package.yaml

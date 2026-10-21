@@ -38,5 +38,6 @@ xcrun simctl install "$udid" "${apps[0]}"
 ditto -c -k --sequesterRsrc --keepParent "${apps[0]}" native-results/wordmine-ios-simulator.zip
 shasum -a 256 native-results/wordmine-ios-simulator.zip > native-results/ios-simulator.sha256
 MAESTRO_CLI_NO_ANALYTICS=1 maestro --device "$udid" test --format junit \
-  --output native-results/ios-runtime.xml --debug-output native-results/maestro .maestro/study.yaml
+  --output native-results/ios-runtime.xml --debug-output native-results/maestro \
+  --test-output-dir native-results/maestro .maestro/study.yaml
 xcrun simctl io "$udid" screenshot native-results/ios-complete.png

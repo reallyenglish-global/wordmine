@@ -1,0 +1,81 @@
+{
+  "contract": "wordmine.words.v0",
+  "contentVersion": "0.1.0",
+  "items": [
+    {
+      "id": "word.harbor",
+      "headword": {
+        "lang": "en",
+        "text": "harbor"
+      },
+      "forms": [
+        {
+          "kind": "alternative-spelling",
+          "value": {
+            "lang": "en",
+            "text": "harbour"
+          }
+        }
+      ],
+      "senses": [
+        {
+          "id": "sense.harbor.1",
+          "definition": {
+            "lang": "en",
+            "text": "a sheltered place where boats can stay"
+          },
+          "translations": [],
+          "examples": [
+            {
+              "id": "example.harbor.1",
+              "role": "practice",
+              "text": {
+                "lang": "en",
+                "text": "The boat entered the harbor."
+              }
+            }
+          ],
+          "imageAssetIds": [
+            "asset.tile"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "word.lantern",
+      "headword": {
+        "lang": "en",
+        "text": "lantern"
+      },
+      "senses": [
+        {
+          "id": "sense.lantern.1",
+          "definition": {
+            "lang": "en",
+            "text": "a portable light inside a protective case"
+          },
+          "translations": [],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "word.meadow",
+      "headword": {
+        "lang": "en",
+        "text": "meadow"
+      },
+      "senses": [
+        {
+          "id": "sense.meadow.1",
+          "definition": {
+            "lang": "en",
+            "text": "an open field covered with grass"
+          },
+          "translations": [],
+          "examples": []
+        }
+      ]
+    }
+  ]
+}

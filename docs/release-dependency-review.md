@@ -10,6 +10,12 @@ Locked changes: Expo, expo-modules-core, expo-modules-jsi, Expo CLI, router-serv
 
 Tests in `tests/xcode-prebuild.test.ts` guard the compatible upstream dependency path and absence of vulnerable uuid, and exercise Xcode project parsing, 24-character ID generation, group mutation and write/reparse preservation. Full native acceptance remains required because project tooling and native Expo modules changed.
 
+## Native test-helper correction discovered during verification
+
+The first exact-head iOS simulator run at `91d41bf` compiled and reached package-flow setup, then Maestro reported that `Saved on this device` was not visible. Its failure screenshot and captured accessibility hierarchy both show that exact text fully visible near the bottom of the page. The shared reveal helper requested `centerElement: true`; [Maestro's documented behaviour](https://docs.maestro.dev/reference/commands-available/scrolluntilvisible) adds a positional requirement beyond visibility, which a footer with insufficient content below it may not meet.
+
+The helper now explicitly requires **100% visibility**, with `centerElement: false`. The 20-second timeout, selectors, activity answers, grading/persistence assertions and flow order are unchanged; no retries added. A configuration regression test guards that distinction. This is a supporting test-harness correction, not an application/storage workaround; fresh exact-head native acceptance must verify it before claiming success. The earlier failed run remains part of the evidence.
+
 ## Remaining security findings
 
 Read-only `npm audit --omit=dev --json` on this lockfile still exits 1: **15 affected package nodes, all high**, propagated from two root advisories. This improves on the previous 18 nodes (15 high, 3 moderate); it does not mean the remaining high findings are fixed or accepted.

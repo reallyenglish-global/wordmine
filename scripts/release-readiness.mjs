@@ -20,7 +20,15 @@ const report = (config) => {
   if (config.privacyApproved !== true) blockers.push('privacy approval is unresolved');
   return {
     preview: { ready: true, identity: 'prototype; preview only' },
-    store: { ready: blockers.length === 0, blockers },
+    configuration: { ready: blockers.length === 0, blockers },
+    store: { ready: false, blockers: [
+      ...blockers,
+      'candidate identity and version must be applied to and verified in the native build',
+      'signed AAB and upload-certificate verification are pending',
+      'target API and 16 KB native-library compatibility verification are pending',
+      'release-candidate device acceptance is pending',
+      'Play Console listing, declarations and track acceptance are pending',
+    ] },
     publication: { authorized: false, note: 'Preflight never authorizes signing, upload, or distribution.' },
   };
 };
@@ -28,7 +36,7 @@ const report = (config) => {
 try {
   const result = report(parse());
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-  process.exitCode = result.store.ready ? 0 : 1;
+  process.exitCode = result.configuration.ready ? 0 : 1;
 } catch (error) {
   process.stdout.write(`${JSON.stringify({ errors: [error.message] }, null, 2)}\n`);
   process.exitCode = 2;

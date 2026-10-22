@@ -55,10 +55,13 @@ test('malformed JSON and malformed values fail closed', () => {
   assert.equal(JSON.parse(invalid.stdout).store.ready, false);
 });
 
-test('a fully specified synthetic candidate can pass store preflight without implying publication', () => {
+test('a synthetic candidate passes configuration checks but never claims Play release readiness', () => {
   const result = run(valid);
   const report = JSON.parse(result.stdout);
   assert.equal(result.status, 0);
-  assert.equal(report.store.ready, true);
+  assert.equal(report.configuration.ready, true);
+  assert.equal(report.store.ready, false);
+  assert.ok(report.store.blockers.includes('signed AAB and upload-certificate verification are pending'));
+  assert.ok(report.store.blockers.includes('Play Console listing, declarations and track acceptance are pending'));
   assert.equal(report.publication.authorized, false);
 });

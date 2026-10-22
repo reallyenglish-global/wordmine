@@ -50,13 +50,34 @@ workers. First visit must be online; browser data eviction/clearing loses practi
 The service worker is not registered in Expo development mode. Do not deploy this
 worker on a shared authenticated app origin without a new scope/cache review.
 
+### Activity end-to-end tests
+
+`npm run build:web && npm run test:browser` tests the exported app in desktop Chromium and Pixel 7 mobile-browser emulation (touch, Android user agent and mobile viewport). These are real browser UI tests, **not native Android emulator/device tests**. Each case uses isolated browser storage; no production content or private API is used.
+
+`tests/browser/activities.spec.ts` covers both the local study pack and bundled package:
+
+- No advancing unanswered cards; empty/whitespace spelling cannot be submitted.
+- Incorrect meaning/spelling feedback, locked first answers, and persistence after reload.
+- Navigation/resume and clean input when moving to a different recall card.
+- All six meaning/spelling cards completed offline, case/whitespace normalization, exact score, persisted completion, and persisted fresh restart.
+- Contract-demo choice changes before submit, incorrect feedback, locked choices and clean retry; checked state is asserted through accessible radio semantics.
+
+Existing package rejection/isolation, storage failure, CSP and PWA tests run in both projects too. Failure screenshots and Playwright traces are retained under `test-results/`, which the existing CI artifact step uploads. Offline-completion screenshots use per-test/per-project output paths. For a quick focused run:
+
+```sh
+npm run build:web
+npx playwright test tests/browser/activities.spec.ts --project=android-mobile-web
+# Inspect a failure trace:
+npx playwright show-trace <path-to-trace.zip>
+```
+
 ### Platform evidence and remaining gates
 
 - Web/PWA: exercised locally in Chromium, narrow and desktop layouts. Install UI,
   Safari/iOS home-screen behavior and cache-upgrade lifecycle still need testing.
 - CI now builds a revision-labelled non-debug Android preview APK on PR and manual runs; it is a disposable preview build using generated prototype signing, not a store-signed artifact. The `android-preview` job publishes the APK, SHA-256, source SHA and build metadata for seven days; it does not publish to a release, store, public endpoint, or bucket. The existing main-branch debug-prototype APK behavior is unchanged.
 - Manual workflow dispatch downloads and checksum-verifies that exact preview APK before Android emulator acceptance; the iOS simulator remains a separate build. Preview emulator acceptance does not imply physical-device, store-signing or publication readiness.
-- iOS Xcode/device CI, physical-device checks, signing and store distribution remain separate gates. `npm run release:readiness` reports preview/store readiness from supplied JSON; a passing synthetic candidate does not approve real identity, content rights, privacy, signing, or publication.
+- Physical-device checks, signing and store distribution remain separate gates. `npm run release:readiness` validates supplied JSON, not the actual native artifact: exit 0 means only `configuration.ready`; exit 1 means configuration blockers; exit 2 means missing/malformed JSON. `store.ready` stays false because build identity/version, signed AAB/certificate, target API/16 KB library compatibility, release-candidate device testing and Play Console acceptance still require independent evidence. It never applies configuration to Expo or authorizes publication.
 
 ## Synthetic package reader (WM-PACK-01)
 

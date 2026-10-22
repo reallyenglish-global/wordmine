@@ -37,6 +37,7 @@ export function MeaningActivityScreen({ document, grader }: Props) {
               key={choice.id}
               accessibilityRole="radio"
               accessibilityLabel={choice.label.text}
+              aria-checked={isSelected}
               accessibilityState={{ checked: isSelected, disabled: submitted }}
               disabled={submitted}
               onPress={() => setSelected(choice.id)}

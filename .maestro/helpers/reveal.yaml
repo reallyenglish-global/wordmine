@@ -11,4 +11,7 @@ name: Reveal a known element from a stable screen anchor
       text: ${TARGET}
     direction: DOWN
     timeout: 20000
-    centerElement: true
+    # Footer/status targets may be fully visible without enough content below
+    # to move into Maestro's centre band. Require visibility, not positioning.
+    visibilityPercentage: 100
+    centerElement: false

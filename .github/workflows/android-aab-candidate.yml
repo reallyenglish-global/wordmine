@@ -1,0 +1,48 @@
+name: Unsigned Android AAB candidate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android-aab-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      CI: '1'
+      WORDMINE_ANDROID_VERSION_CODE: ${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run contract:check
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools build-tools;36.0.0
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Generate prototype Android project with explicit run-scoped version code
+        run: npx expo prebuild --platform android --no-install
+      - name: Remove only Expo's default debug key from the generated release variant
+        run: node scripts/strip-debug-release-signing.mjs android/app/build.gradle
+      - name: Build unsigned prototype AAB (not for distribution)
+        working-directory: android
+        run: ./gradlew :app:bundleRelease --no-daemon
+      - name: Validate AAB and extract base manifest with bundletool
+        run: android/gradlew -p scripts/aab-validator verifyAab dumpManifest -Paab="$GITHUB_WORKSPACE/android/app/build/outputs/bundle/release/app-release.aab" -Pmanifest="$RUNNER_TEMP/wordmine-app-manifest-${GITHUB_RUN_ID}.xml" --project-cache-dir "$RUNNER_TEMP/wordmine-aab-validator-project-cache" --no-daemon --console=plain
+      - name: Verify unsigned bundle identity, version and record provenance
+        run: node scripts/android-aab-candidate.mjs verify android/app/build/outputs/bundle/release/app-release.aab "$WORDMINE_ANDROID_VERSION_CODE" "$(git rev-parse HEAD)" "$RUNNER_TEMP/wordmine-app-manifest-${GITHUB_RUN_ID}.xml"

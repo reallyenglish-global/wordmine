@@ -1,6 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+
+const workflowFiles = ['.github/workflows/ci.yml', '.github/workflows/android-aab-candidate.yml'];
+test('hosted workflows use Node 24 actions and pinned Ubuntu 24.04 runners', () => {
+  for (const file of workflowFiles) {
+    const workflow = readFileSync(file, 'utf8');
+    assert.match(workflow, /runs-on: ubuntu-24[.]04/, `${file} must pin Ubuntu 24.04`);
+    assert.doesNotMatch(workflow, /runs-on: ubuntu-latest/, `${file} must not use the migrating ubuntu-latest label`);
+    assert.match(workflow, /actions\/checkout@v5/, `${file} must use Node 24-compatible checkout`);
+    assert.match(workflow, /actions\/setup-node@v5/, `${file} must use Node 24-compatible setup-node`);
+    assert.doesNotMatch(workflow, /actions\/checkout@v4|actions\/setup-node@v4/, `${file} must not retain Node 20 action versions`);
+  }
+});
 
 const run = (config: unknown) => spawnSync('node', ['scripts/release-readiness.mjs'], {
   encoding: 'utf8',

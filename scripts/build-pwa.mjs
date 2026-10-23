@@ -23,7 +23,10 @@ await writeFile(path.join(root, 'register-sw.js'), `if ('serviceWorker' in navig
 async function files(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
   const all = await Promise.all(entries.map(e => e.isDirectory() ? files(path.join(dir, e.name)) : [path.join(dir, e.name)]));
-  return all.flat().filter(f => !['sw.js', 'metadata.json'].includes(path.basename(f)));
+  return all.flat().filter(f => {
+    const relative = path.relative(root, f).split(path.sep).join('/');
+    return !['sw.js', 'metadata.json'].includes(path.basename(f)) && !relative.startsWith('sample-pack/');
+  });
 }
 const assets = (await files(root)).sort();
 const hash = createHash('sha256');
@@ -45,4 +48,4 @@ self.addEventListener('fetch', event => {
   }
 });
 `);
-console.log(`PWA: ${cache}; ${urls.length} same-origin shell assets. No account/API caching.`);
+console.log(`PWA: ${cache}; ${urls.length} shell assets. No account/API caching; sample packs are not shell-precached.`);

@@ -1,0 +1,18 @@
+{
+  "contract": "wordmine.lists.v0",
+  "contentVersion": "0.1.0",
+  "items": [
+    {
+      "id": "list.synthetic-harbor",
+      "title": {
+        "lang": "en",
+        "text": "Synthetic harbour words"
+      },
+      "wordIds": [
+        "word.harbor",
+        "word.lantern",
+        "word.meadow"
+      ]
+    }
+  ]
+}

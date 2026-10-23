@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
@@ -8,6 +8,7 @@ import { advance, createSession, restoreSession, storageKey, submitAnswer, type 
 import sample from './src/study/synthetic-en.json';
 import { ContractPreview } from './src/screens/ContractPreview';
 import { PackagePreview } from './src/screens/PackagePreview';
+import { DownloadablePackagePreview } from './src/screens/DownloadablePackagePreview';
 
 const pack = parsePack(sample);
 const cards = buildCards(pack);
@@ -15,6 +16,7 @@ const cards = buildCards(pack);
 function StudyApp() {
   const [contractDemo, setContractDemo] = useState(false);
   const [packageDemo, setPackageDemo] = useState(false);
+  const [downloadDemo, setDownloadDemo] = useState(false);
   const [session, setSession] = useState(() => createSession(pack));
   const [ready, setReady] = useState(false);
   const [studying, setStudying] = useState(false);
@@ -50,6 +52,7 @@ function StudyApp() {
   );
   if (contractDemo) return <ContractPreview onBack={() => setContractDemo(false)} />;
   if (packageDemo) return <PackagePreview onBack={() => setPackageDemo(false)} />;
+  if (downloadDemo) return <DownloadablePackagePreview onBack={() => setDownloadDemo(false)} />;
   return <SafeAreaView style={styles.screen}>
     <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
       <View style={styles.content}>
@@ -89,6 +92,7 @@ function StudyApp() {
         </View>}
         {ready && !studying && button('Explore contract demo', () => setContractDemo(true), true)}
         {ready && !studying && button('Explore package demo', () => setPackageDemo(true), true)}
+        {ready && !studying && Platform.OS === 'web' && button('Explore online and offline packs', () => setDownloadDemo(true), true)}
         {ready && <Text accessibilityLiveRegion="polite" style={styles.footer}>{saving ? 'Saving…' : storageError ? 'Storage unavailable. Practice is temporary until a save succeeds.' : 'Saved on this device'}</Text>}
         <Text style={styles.footer}>Practice on this device only. No course reporting or mastery claim.</Text>
         <Text style={styles.footer}>Original synthetic content · pack {pack.version} · preview, not a production course</Text>

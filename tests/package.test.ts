@@ -33,6 +33,16 @@ test('bundled source bytes cannot drift from checked-in fixtures', () => {
   assert.deepEqual(bundled,fixture());
 });
 
+test('web-served package files exactly match the original synthetic fixture', () => {
+  const root = join(process.cwd(),'public/sample-pack');
+  const served: Record<string,Uint8Array> = {};
+  for (const entry of readdirSync(root,{recursive:true,withFileTypes:true})) if (entry.isFile()) {
+    const full = join(entry.parentPath,entry.name);
+    served[relative(root,full).replaceAll('\\\\','/')] = new Uint8Array(readFileSync(full));
+  }
+  assert.deepEqual(served,fixture());
+});
+
 test('inherited manifests and empty normalized spelling aliases are rejected', () => {
   const files = fixture();
   const inherited = Object.assign(Object.create({'manifest.json':files['manifest.json']}),files);

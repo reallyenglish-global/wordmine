@@ -1,0 +1,55 @@
+plugins { id 'java' }
+
+repositories {
+  google()
+  mavenCentral()
+}
+
+configurations {
+  bundletool
+}
+
+dependencies {
+  bundletool 'com.android.tools.build:bundletool:1.18.0'
+}
+
+// Keep generated Gradle outputs outside the checkout and on the runner's temp disk.
+def tempRoot = System.getenv('RUNNER_TEMP') ?: System.getProperty('java.io.tmpdir')
+def runId = System.getenv('GITHUB_RUN_ID') ?: 'local'
+layout.buildDirectory.set(file("${tempRoot}/wordmine-aab-validator-${runId}"))
+
+def candidateAab = providers.gradleProperty('aab')
+tasks.register('verifyAab', JavaExec) {
+  classpath = configurations.bundletool
+  mainClass = 'com.android.tools.build.bundletool.BundleToolMain'
+  standardOutput = new ByteArrayOutputStream()
+  doFirst {
+    if (!candidateAab.isPresent()) {
+      throw new GradleException('Pass -Paab=<absolute-app-bundle-path>')
+    }
+    args 'validate', "--bundle=${candidateAab.get()}"
+  }
+  doLast {
+    logger.lifecycle('bundletool validated the Android App Bundle structure and manifest.')
+  }
+}
+
+def manifestXmlPath = providers.gradleProperty('manifest')
+tasks.register('dumpManifest', JavaExec) {
+  classpath = configurations.bundletool
+  mainClass = 'com.android.tools.build.bundletool.BundleToolMain'
+  def manifestOutput = new ByteArrayOutputStream()
+  standardOutput = manifestOutput
+  doFirst {
+    if (!candidateAab.isPresent() || !manifestXmlPath.isPresent()) {
+      throw new GradleException('Pass -Paab=<absolute-app-bundle-path> and -Pmanifest=<output-path>')
+    }
+    args 'dump', 'manifest', "--bundle=${candidateAab.get()}", '--module=base'
+  }
+  doLast {
+    def outputFile = file(manifestXmlPath.get())
+    outputFile.parentFile.mkdirs()
+    outputFile.bytes = manifestOutput.toByteArray()
+    logger.lifecycle('bundletool exported the base manifest for identity/version verification.')
+  }
+}

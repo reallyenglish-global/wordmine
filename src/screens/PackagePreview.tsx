@@ -76,7 +76,7 @@ function PackagePractice({content,onBack,source}: {content:ContentPackage;onBack
         {card.kind === 'meaning-from-definition' ? card.choices.map(choice => <View key={choice.id}>
           {button(`Choose ${choice.label.text}`,() => {void save(submit(session,cards,choice.id));},!!response)}
         </View>) : <>
-          <TextInput accessibilityLabel="Package spelling" value={answer} onChangeText={setAnswer} editable={!response&&!saving} maxLength={16384}
+          <TextInput accessibilityLabel="Package spelling" value={response ? session.answers[card.id] : answer} onChangeText={setAnswer} editable={!response&&!saving} maxLength={16384}
             autoCapitalize="none" autoCorrect={false} spellCheck={false} placeholder="Type the word" placeholderTextColor="#9baabd" style={styles.input}/>
           {!response&&button('Check package spelling',() => {void save(submit(session,cards,answer));},!normalizeSpelling(answer))}
         </>}

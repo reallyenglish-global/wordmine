@@ -76,7 +76,7 @@ function StudyApp() {
           {card.kind === 'meaning-choice' ? card.choices.map(choice => <View key={choice.id}>
             {button(`Choose ${choice.label}`, () => { void save(submitAnswer(session, cards, choice.id)); }, true, !!result)}
           </View>) : <>
-            <TextInput accessibilityLabel="Your spelling" value={answer} onChangeText={setAnswer} editable={!result && !saving}
+            <TextInput accessibilityLabel="Your spelling" value={result?.answer ?? answer} onChangeText={setAnswer} editable={!result && !saving}
               autoCapitalize="none" autoCorrect={false} spellCheck={false} placeholder="Type the word" placeholderTextColor="#9baabd"
               onSubmitEditing={() => { if (!result) void save(submitAnswer(session, cards, answer)); }} style={styles.input} />
             {!result && button('Check spelling', () => { void save(submitAnswer(session, cards, answer)); }, false, !answer.trim())}

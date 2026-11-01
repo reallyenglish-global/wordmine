@@ -89,6 +89,31 @@ test('bundled package validates and resumes after offline reload', async ({page,
   await page.screenshot({path:'test-results/wm-package-offline.png',fullPage:true});
 });
 
+test('word feedback keeps recognition separate from recall and survives reload', async ({page}) => {
+  await page.goto('/');
+  await page.getByRole('button',{name:'Explore package demo',exact:true}).click();
+  for (const word of ['harbor','lantern','meadow']) {
+    await page.getByRole('button',{name:`Choose ${word === 'harbor' ? 'meadow' : word}`,exact:true}).click();
+    await page.getByRole('button',{name:'Next package card',exact:true}).click();
+    await page.getByRole('textbox',{name:'Package spelling',exact:true}).fill(word === 'harbor' ? 'HARBOUR' : word);
+    await page.getByRole('button',{name:'Check package spelling',exact:true}).click();
+    await page.getByRole('button',{name:word === 'meadow' ? 'Finish package practice' : 'Next package card',exact:true}).click();
+  }
+  for (const reload of [false,true]) {
+    if (reload) {
+      await page.reload();
+      await page.getByRole('button',{name:'Explore package demo',exact:true}).click();
+    }
+    await expect(page.getByText('5 of 6 correct',{exact:true})).toBeVisible();
+    await expect(page.getByText('harbor: recognition 0/1 · recall 1/1 · More practice suggested',{exact:true})).toBeVisible();
+    await expect(page.getByText('lantern: recognition 1/1 · recall 1/1',{exact:true})).toBeVisible();
+    await expect(page.getByText('Recognition and recall reflect this attempt only, not long-term mastery.',{exact:true})).toBeVisible();
+  }
+  await page.getByRole('button',{name:'Restart package practice',exact:true}).click();
+  await expect(page.getByText('Package card 1 of 6',{exact:true})).toBeVisible();
+  await expect(page.getByText(/More practice suggested/)).toHaveCount(0);
+});
+
 test('package storage denial permits visibly temporary practice', async ({page}) => {
   await page.addInitScript(() => {
     Storage.prototype.getItem = function(){throw Error('denied');};

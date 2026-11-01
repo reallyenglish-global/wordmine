@@ -12,7 +12,7 @@ const fail = (message: string) => {
 
 const committed = JSON.parse(readFileSync(resolve(JSON_SCHEMA_PATH), 'utf8'));
 if (JSON.stringify(committed) !== JSON.stringify(buildJsonSchema())) {
-  fail(`${JSON_SCHEMA_PATH} is out of date; run npm run contract:schema`);
+  fail(`${JSON_SCHEMA_PATH} is out of date; run pnpm run contract:schema`);
 }
 
 const valid = loadValidFixtures();

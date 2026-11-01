@@ -4,9 +4,10 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {syntheticFiles} from '../package/synthetic.generated';
 import {encodeUtf8} from '../package/bytes';
-import {cardsForList, readPackage, type ContentPackage} from '../package/reader';
+import {readPackage, type ContentPackage} from '../package/reader';
 import {evaluate, normalizeSpelling} from '../package/evaluate';
-import {initialSession, next, packageStorageKey, restore, submit, type PackageSession} from '../package/session';
+import {packageStorageKey, type PackageSession} from '../package/session';
+import {createPracticeEngine} from '../engine/practice';
 
 function bundledFiles() {
   return Object.fromEntries(Object.entries(syntheticFiles).map(([name,data]) =>
@@ -21,27 +22,28 @@ export function PackagePreview({onBack,source=bundledFiles}: {onBack:()=>void;so
     <Text style={styles.note}>No package was activated. Your existing practice is unchanged.</Text>
     <Pressable accessibilityRole="button" accessibilityLabel="Back to study" onPress={onBack} style={styles.button}><Text style={styles.buttonText}>Back to study</Text></Pressable>
   </View></SafeAreaView>;
-  return <PackagePractice content={loaded.content} onBack={onBack} source={source}/>;
+  return <PackagePractice key={packageStorageKey(loaded.content,loaded.content.lists[0].id)} content={loaded.content} onBack={onBack} source={source}/>;
 }
 function PackagePractice({content,onBack,source}: {content:ContentPackage;onBack:()=>void;source:()=>Record<string,Uint8Array>}) {
   const list = content.lists[0]; // This bounded preview displays the first list of the bundled synthetic pack.
-  const cards = useMemo(() => cardsForList(content,list.id),[content,list.id]);
-  const [session,setSession] = useState(() => initialSession(content,list.id));
+  const engine = useMemo(() => createPracticeEngine(content,list.id),[content,list.id]);
+  const cards = engine.cards;
+  const [session,setSession] = useState(() => engine.createSession());
   const [ready,setReady] = useState(false);
   const [saving,setSaving] = useState(false);
   const [storageError,setStorageError] = useState(false);
   const [answer,setAnswer] = useState('');
   const [rejection,setRejection] = useState('');
   const lock = useRef(false);
-  const key = packageStorageKey(content,list.id);
+  const key = engine.storageKey;
   useEffect(() => {
     let active = true;
     setReady(false);
-    AsyncStorage.getItem(key).then(raw => {if(active) setSession(restore(raw,content,list.id));})
+    AsyncStorage.getItem(key).then(raw => {if(active) setSession(engine.restore(raw));})
       .catch(() => {if(active) setStorageError(true);})
       .finally(() => {if(active) setReady(true);});
     return () => {active=false;};
-  },[content,key,list.id]);
+  },[engine,key]);
   async function save(value:PackageSession) {
     if(lock.current) return;
     lock.current=true; setSession(value); setSaving(true);
@@ -58,7 +60,8 @@ function PackagePractice({content,onBack,source}: {content:ContentPackage;onBack
   }
   const card = cards[session.index];
   const response = card && Object.hasOwn(session.answers,card.id) ? evaluate(card,session.answers[card.id]) : undefined;
-  const score = cards.filter(c => Object.hasOwn(session.answers,c.id) && evaluate(c,session.answers[c.id]).correct).length;
+  const summary = engine.summary(session);
+  const score = summary.correct;
   const button = (label:string,action:()=>void,disabled=false) => <Pressable accessibilityRole="button" accessibilityLabel={label}
     disabled={saving||disabled} onPress={action} style={[styles.button,(saving||disabled)&&styles.disabled]}><Text style={styles.buttonText}>{label}</Text></Pressable>;
   return <SafeAreaView style={styles.screen}><ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scroll}>
@@ -68,21 +71,25 @@ function PackagePractice({content,onBack,source}: {content:ContentPackage;onBack
       <Text style={styles.note}>Package {content.manifest.contentVersion} · {content.manifest.languages.target} · manifest {content.manifestHash.slice(0,12)}</Text>
       {!ready ? <ActivityIndicator accessibilityLabel="Loading package practice"/> : !card ? <View style={styles.card}>
         <Text style={styles.title}>{score} of {cards.length} correct</Text>
-        {button('Restart package practice',() => {setAnswer('');void save(initialSession(content,list.id));})}
+        <Text style={styles.note}>Recognition and recall reflect this attempt only, not long-term mastery.</Text>
+        {summary.words.map(word => <View key={word.wordId}>
+          <Text style={styles.note}>{word.word}: recognition {word.recognition.correct}/{word.recognition.total} · recall {word.recall.correct}/{word.recall.total}{word.needsPractice ? ' · More practice suggested' : ''}</Text>
+        </View>)}
+        {button('Restart package practice',() => {setAnswer('');void save(engine.createSession());})}
       </View> : <View style={styles.card}>
         <Text style={styles.tag}>Package card {session.index+1} of {cards.length}</Text>
         <Text style={styles.note}>{card.kind === 'meaning-from-definition'?'Choose the matching word':'Spell the word from its meaning'}</Text>
         <Text style={styles.title}>{card.prompt.text}</Text>
         {card.kind === 'meaning-from-definition' ? card.choices.map(choice => <View key={choice.id}>
-          {button(`Choose ${choice.label.text}`,() => {void save(submit(session,cards,choice.id));},!!response)}
+          {button(`Choose ${choice.label.text}`,() => {void save(engine.submit(session,choice.id));},!!response)}
         </View>) : <>
           <TextInput accessibilityLabel="Package spelling" value={answer} onChangeText={setAnswer} editable={!response&&!saving} maxLength={16384}
             autoCapitalize="none" autoCorrect={false} spellCheck={false} placeholder="Type the word" placeholderTextColor="#9baabd" style={styles.input}/>
-          {!response&&button('Check package spelling',() => {void save(submit(session,cards,answer));},!normalizeSpelling(answer))}
+          {!response&&button('Check package spelling',() => {void save(engine.submit(session,answer));},!normalizeSpelling(answer))}
         </>}
         {response&&<>
           <Text accessibilityRole="alert" style={styles.feedback}>{response.correct?'Correct.':`Not quite. Answer: ${card.word}`}</Text>
-          {button(session.index===cards.length-1?'Finish package practice':'Next package card',() => {setAnswer('');void save(next(session,cards));})}
+          {button(session.index===cards.length-1?'Finish package practice':'Next package card',() => {setAnswer('');void save(engine.advance(session));})}
         </>}
       </View>}
       {ready&&<Text accessibilityLiveRegion="polite" style={styles.note}>{saving?'Saving package practice…':storageError?'Package storage unavailable. Practice is temporary.':'Package saved on this device'}</Text>}

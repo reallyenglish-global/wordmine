@@ -123,6 +123,10 @@ These checks do **not** prove WordMine exercise parity, scoring, scheduling, aut
 
 Before connecting to private services, independently review the [WM-NEXT epic](https://github.com/joeywang/re-work) and the pending Lexicon content and wm-api learning-contract draft PRs. Define one approved vertical contract with legacy behavior and sanitized fixtures, an additive versioned API and fallback, then verify it in wm-api, wm-lib and the mobile client. No client-side answer check here should be mistaken for authoritative course progress.
 
+## Reusable vocabulary engine and Play readiness
+
+See [engine API, current product gaps and Google Play release gates](docs/vocabulary-engine-and-play-readiness.md). The package practice screen uses the platform-independent `createPracticeEngine(content, listId)` facade and shows per-word recognition/recall results. This is attempt feedback, not a mastery model or spaced-review scheduler. Existing package/session contracts and the separate original study flow are unchanged.
+
 ## Publication and licensing
 
 This repository is publicly visible under the ReallyEnglish GitHub organization. The Expo template's MIT notice is retained as `EXPO_TEMPLATE_LICENSE.txt` for template attribution; **it is not a project-wide WordMine license**. No license for original WordMine source or content has been selected. Avoid importing private sources or unpublished/licensed vocabulary until that decision is made.

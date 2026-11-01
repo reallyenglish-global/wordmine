@@ -14,7 +14,7 @@ test('package reader and full negative corpus work when string code generation i
     'tests/package.test.ts', 'tests/package-session.test.ts',
   ], {env,encoding:'utf8',maxBuffer:4*1024*1024});
   assert.equal(result.status,0,`${result.stdout.slice(-1800)}\n${result.stderr.slice(-1800)}`);
-  assert.match(result.stdout, /# fail 0/);
+  assert.match(result.stdout, /fail\s+0/);
 });
 
 test('default test suite guards deterministic validator output and rejects stale generated files', () => {

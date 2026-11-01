@@ -32,13 +32,29 @@ function freeze<T>(value: T): T {
   return value;
 }
 
-/** Reads a caller-supplied byte map, not paths/ZIPs/URLs. No fetch, extraction or partial activation. */
-export function readPackage(files: Record<string, Uint8Array>): ContentPackage {
-  const manifestBytes = files['manifest.json'];
-  check(Object.hasOwn(files,'manifest.json') && manifestBytes instanceof Uint8Array && manifestBytes.length <= 256 * 1024, 'missing/oversized manifest');
+function parseManifest(manifestBytes: Uint8Array): Manifest {
+  check(manifestBytes instanceof Uint8Array && manifestBytes.length <= 256 * 1024, 'missing/oversized manifest');
   const rawManifest = parseJson(manifestBytes); structural(rawManifest,'manifest');
   const manifest = rawManifest as Manifest;
   check(manifest.files.length <= 1024 && manifest.files.reduce((n,f) => n + f.bytes,0) <= 128 * 1024 * 1024, 'resource limits');
+  const paths = new Set<string>(['manifest.json']);
+  for (const entry of manifest.files) {
+    check(!paths.has(entry.path) && entry.bytes <= 16 * 1024 * 1024, 'duplicate path or file size limit');
+    paths.add(entry.path);
+  }
+  return manifest;
+}
+
+/** Validates a manifest before a transport uses its relative paths for requests. */
+export function packagePayloadFiles(manifestBytes: Uint8Array): {path:string;bytes:number}[] {
+  return parseManifest(manifestBytes).files.map(({path,bytes}) => ({path,bytes}));
+}
+
+/** Reads a caller-supplied byte map, not paths/ZIPs/URLs. No fetch, extraction or partial activation. */
+export function readPackage(files: Record<string, Uint8Array>): ContentPackage {
+  const manifestBytes = files['manifest.json'];
+  check(Object.hasOwn(files,'manifest.json') && manifestBytes instanceof Uint8Array, 'missing manifest');
+  const manifest = parseManifest(manifestBytes);
   const paths = new Set<string>(['manifest.json']);
   const assets = new Map<string, File>();
   const documents = new Map<string, unknown[]>();

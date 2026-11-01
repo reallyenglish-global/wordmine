@@ -1,0 +1,68 @@
+{
+  "contract": "wordmine.package.v0",
+  "packageId": "pack.synthetic-harbor",
+  "contentVersion": "0.1.0",
+  "title": {
+    "lang": "en",
+    "text": "Synthetic harbour practice"
+  },
+  "languages": {
+    "target": "en",
+    "explanation": "en"
+  },
+  "purpose": "offline-practice",
+  "rights": {
+    "license": "CC0-1.0",
+    "attribution": "Original synthetic WM-NEXT design fixture; generated colour tile, not vocabulary illustration.",
+    "source": "Created for this local contract proposal; no production content.",
+    "reviewStatus": "synthetic-design-fixture"
+  },
+  "requiredCapabilities": [
+    "meaning-from-definition@1",
+    "spelling-from-definition@1"
+  ],
+  "files": [
+    {
+      "role": "lists",
+      "path": "lists.json",
+      "mediaType": "application/json",
+      "bytes": 320,
+      "sha256": "13b60f3c791ed37bcc93596feb85997c55b84afdf930520787a7585ee9dde303"
+    },
+    {
+      "role": "words",
+      "path": "words.json",
+      "mediaType": "application/json",
+      "bytes": 1697,
+      "sha256": "36fc57929a5e15be4a9baa63d65df324215bf27bcb8ee60d301daa6ce3f54868"
+    },
+    {
+      "role": "questions",
+      "path": "questions.json",
+      "mediaType": "application/json",
+      "bytes": 2623,
+      "sha256": "59bd78c326f3aa5cb6d54dad017bd92386c98c1a257fb32c06a80e641e54efb0"
+    },
+    {
+      "role": "answers",
+      "path": "answers.json",
+      "mediaType": "application/json",
+      "bytes": 1108,
+      "sha256": "0cd09fc45fc9784550c4f362f8bf3a1421b91942d27e7fda03095652a0f74ad9"
+    },
+    {
+      "role": "asset",
+      "assetId": "asset.tile",
+      "path": "assets/tile.png",
+      "mediaType": "image/png",
+      "bytes": 69,
+      "sha256": "c7cf9795f9bbe1f7640806542a7a9ae72070bf78ca37acc1abea00f1b68e3bdf",
+      "rights": {
+        "license": "CC0-1.0",
+        "attribution": "Original synthetic WM-NEXT design fixture; generated colour tile, not vocabulary illustration.",
+        "source": "Created for this local contract proposal; no production content.",
+        "reviewStatus": "synthetic-design-fixture"
+      }
+    }
+  ]
+}

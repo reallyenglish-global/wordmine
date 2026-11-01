@@ -44,11 +44,14 @@ exercise choices, spelling, score, restart, reload resume, corrupt state, denied
 storage and a real offline reload after the service worker installs.
 
 The production web export adds a standalone manifest, original W icons and a
-content-hashed shell cache. **Only the exported synthetic app shell is precached**;
-there is no generic API/account caching. Use localhost or HTTPS for service
-workers. First visit must be online; browser data eviction/clearing loses practice.
-The service worker is not registered in Expo development mode. Do not deploy this
-worker on a shared authenticated app origin without a new scope/cache review.
+content-hashed shell cache. **Only the exported app shell is precached**; the
+synthetic sample-pack files are fetched on demand and, only after the explicit
+Download action, saved to IndexedDB for offline package study. No generic API or
+account responses are cached. Use localhost or HTTPS for service workers. First
+visit must be online; browser data eviction/clearing loses local practice and
+downloads. The service worker is not registered in Expo development mode. Do not
+deploy this worker on a shared authenticated app origin without a new scope/cache
+review.
 
 ### Activity end-to-end tests
 
@@ -95,13 +98,17 @@ npx tsx scripts/bundle-package.ts --check
 # Check or regenerate static validators after intentionally changing the package schema:
 npx tsx scripts/generate-package-validators.ts --check
 npx tsx scripts/generate-package-validators.ts
-# Regenerate the bundle after intentionally changing fixture bytes/checksums:
+# Regenerate the app bundle and web-served synthetic package after changing fixture bytes/checksums:
 npx tsx scripts/bundle-package.ts
 # Optional reproducibility check; requires Python with Unicode 16.0.0:
 python3 scripts/generate-casefold.py --check
 ```
 
-Unit tests guard exact fixture-to-bundle byte equality. Browser tests exercise package completion, alternate spelling, rejection, reload/offline resume, denied/corrupt storage and preservation of original practice. The preview shows the first list and validates—but does not render—assets. SHA-256 integrity is not authentication. Media decoding, ZIP extraction, downloads, untrusted packages, signatures and large-pack performance remain outside this slice.
+The PWA export copies the synthetic fixture to `dist/sample-pack/` for the web prototype. The service worker deliberately excludes that directory from its shell precache. In the web-only **Explore online and offline packs** flow, **Study sample online** fetches the same-origin manifest and its declared files for that session; **Download sample for offline use** first validates the complete package, then stores its bytes in IndexedDB. The browser transport allows the app's current origin by default; any publisher/CDN origin requires an explicit code-level allowlist, and there is no user-entered URL. Requests omit credentials and referrers. A downloaded package is reopened and revalidated before study, remains available after an offline reload, and can be explicitly removed. Removing it deletes the package bytes only; device-local progress remains pinned to that package's content identity and list. Package identity includes ID, content version and manifest SHA-256, so changed bytes do not overwrite an earlier download.
+
+This is a synthetic-only transport/storage proof: no real wordlist, wm-api, authentication, server-side progress sync, publisher signature/authenticity, package expiry/revocation policy, or native downloadable-package UI is included. Online sample practice and downloaded-package practice both keep session progress on this device. SHA-256 detects corruption, not publisher authenticity. No archive import, arbitrary URL import, or protected assessment is supported.
+
+Unit tests guard exact fixture-to-bundle byte equality and manifest/path/integrity checks. Browser tests exercise online fetch, download to IndexedDB, failed/corrupt package rejection, exclusion from the service-worker shell cache, and offline study after reload, alongside package completion, alternate spelling, denied/corrupt storage and preservation of original practice. The preview shows the first list and validates—but does not render—assets. Large-pack performance and production trust/rights gates remain separate work.
 
 WM-PACK-02 replaces import-time Ajv compilation with checked-in static validators. `npm test` guards deterministic regeneration (including a deliberately stale-file rejection) and reruns the full package corpus with Node's `--disallow-code-generation-from-strings`. A browser test exercises real practice under a CSP without `unsafe-eval`, including an external-script negative control proving string code generation is blocked. The test allows inline bootstrap/styles; it is **not** a fully hardened production CSP or a deployment header change. Ajv is still a runtime dependency for small static validation helpers, not its compiler.
 

@@ -17,7 +17,7 @@
       "$ref": "#/$defs/Languages"
     },
     "activity": {
-      "anyOf": [
+      "oneOf": [
         {
           "$ref": "#/$defs/MeaningFromDefinitionActivity"
         }
@@ -35,7 +35,6 @@
   ],
   "$defs": {
     "Languages": {
-      "description": "UI, target and explanation languages are separate by product requirement",
       "type": "object",
       "properties": {
         "ui": {
@@ -52,12 +51,13 @@
         "ui",
         "target",
         "explanation"
-      ]
+      ],
+      "description": "UI, target and explanation languages are separate by product requirement"
     },
     "LanguageTag": {
-      "description": "BCP 47 language tag",
       "type": "string",
-      "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
+      "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$",
+      "description": "BCP 47 language tag"
     },
     "MeaningFromDefinitionActivity": {
       "type": "object",
@@ -93,7 +93,6 @@
       ]
     },
     "LocalizedText": {
-      "description": "Learner-visible text with its language tag",
       "type": "object",
       "properties": {
         "lang": {
@@ -107,7 +106,8 @@
       "required": [
         "lang",
         "text"
-      ]
+      ],
+      "description": "Learner-visible text with its language tag"
     },
     "Choice": {
       "type": "object",
@@ -126,7 +126,6 @@
       ]
     },
     "AnswerKey": {
-      "description": "Grading data for one activity; may be omitted from a prompt-only document",
       "type": "object",
       "properties": {
         "activityId": {
@@ -157,7 +156,8 @@
         "activityId",
         "kind",
         "choiceId"
-      ]
+      ],
+      "description": "Grading data for one activity; may be omitted from a prompt-only document"
     }
   }
 }

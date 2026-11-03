@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # Preserve isolated prototype identities for existing preview/native test flows.
+  WORDMINE_ANDROID_PROTOTYPE: '1'
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -27,6 +31,12 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run contract:check
+      - run: npm audit --audit-level=low
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - run: python3 -m unittest discover -s tests -p '*_test.py' -v
 
   web-pwa:
     needs: contracts
@@ -106,7 +116,7 @@ jobs:
           cp "$RUNNER_TEMP/wordmine-preview-signed.apk" preview/wordmine-preview.apk
           sha256sum preview/wordmine-preview.apk > preview/sha256.txt
           git rev-parse HEAD > preview/source-sha.txt
-          node -e 'const c=require("./app.json").expo; require("fs").writeFileSync("preview/build-metadata.json", JSON.stringify({applicationId:c.android.package, version:c.version, androidVersionCode:c.android.versionCode??null, variant:"release", signing:"disposable CI-only preview key; not for store updates"},null,2)+"\n")'
+          node -e 'const c=require("./app.config.js")({config:require("./app.json").expo}); require("fs").writeFileSync("preview/build-metadata.json", JSON.stringify({applicationId:c.android.package, version:c.version, androidVersionCode:c.android.versionCode??null, variant:"release", signing:"disposable CI-only preview key; not for store updates"},null,2)+"\n")'
       - uses: actions/upload-artifact@v4
         with:
           name: wordmine-preview-${{ github.sha }}

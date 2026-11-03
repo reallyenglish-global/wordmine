@@ -6,6 +6,9 @@ on:
 permissions:
   contents: read
 
+env:
+  WORDMINE_ANDROID_PROTOTYPE: '1'
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

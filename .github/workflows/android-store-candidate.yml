@@ -1,0 +1,68 @@
+# Credential-free permanent-package inspection. VersionCode 1 is test-only, not a Play choice.
+name: Unsigned Android store-candidate verification
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: unsigned-store-candidate-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  unsigned-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      CI: '1'
+      # Dispatch inputs are passed as data, never interpolated into shell code.
+      WORDMINE_ANDROID_RELEASE_VERSION_CODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - run: npm ci --ignore-scripts
+      - run: npm audit --audit-level=low
+      - run: npm run typecheck && npm test && npm run contract:check
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Exercise real archive-signature security regression tests
+        run: python3 -m unittest discover -s tests -p '*_test.py'
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
+        with:
+          packages: platform-tools build-tools;36.0.0 cmdline-tools;latest
+      - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
+      - name: Generate permanent-identity release project and remove template debug signing
+        run: |
+          npx expo prebuild --platform android --no-install
+          node scripts/strip-debug-release-signing.mjs android/app/build.gradle
+      - name: Compile release APK and AAB without template signing
+        working-directory: android
+        run: ./gradlew :app:assembleRelease :app:bundleRelease --no-daemon
+      - name: Validate bundle and extract manifest
+        run: |
+          android/gradlew -p scripts/aab-validator verifyAab dumpManifest -Paab="$GITHUB_WORKSPACE/android/app/build/outputs/bundle/release/app-release.aab" -Pmanifest="$RUNNER_TEMP/aab-manifest.xml" --project-cache-dir "$RUNNER_TEMP/aab-validator" --no-daemon --console=plain
+          node scripts/android-release.mjs "$RUNNER_TEMP/aab-manifest.xml" "$WORDMINE_ANDROID_RELEASE_VERSION_CODE"
+      - name: Stage unsigned inputs (never private signing material)
+        run: |
+          mkdir -p unsigned-artifacts
+          cp android/app/build/outputs/bundle/release/app-release.aab unsigned-artifacts/app-release.aab
+          cp android/app/build/outputs/apk/release/app-release-unsigned.apk unsigned-artifacts/app-release-unsigned.apk
+          cp "$RUNNER_TEMP/aab-manifest.xml" unsigned-artifacts/aab-manifest.xml
+      - name: Inspect actual permanent-package unsigned store bundle (not uploadable)
+        run: |
+          curl --fail --location --retry 3 https://github.com/google/bundletool/releases/download/1.18.3/bundletool-all-1.18.3.jar --output "$RUNNER_TEMP/bundletool.jar"
+          VERSION="$(python3 -c 'import json; print(json.load(open("app.json"))["expo"]["version"])')"
+          python3 scripts/verify-play-artifact.py unsigned-artifacts/app-release.aab --require-unsigned --bundletool "$RUNNER_TEMP/bundletool.jar" --package com.reallyenglish.wordmine --version-code "$WORDMINE_ANDROID_RELEASE_VERSION_CODE" --version-name "$VERSION" --output unsigned-artifacts
+          printf 'sourceSha=%s\nversionCode=1\npurpose=unsigned permanent-package verification only; never upload\n' "$GITHUB_SHA" > unsigned-artifacts/provenance.txt
+          (cd unsigned-artifacts && sha256sum app-release.aab app-release-unsigned.apk > SHA256SUMS)
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: wordmine-unsigned-store-check-${{ github.sha }}-${{ github.run_attempt }}
+          path: unsigned-artifacts/
+          if-no-files-found: error
+          retention-days: 7

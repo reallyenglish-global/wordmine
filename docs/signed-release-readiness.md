@@ -22,6 +22,14 @@ this is crypto integration evidence, not either app's store release or device QA
 
 ## 2026-11-03 continuation — internal testing first
 
+The extra native iOS acceptance run exposed a real Expo Modules JSI Swift compile
+failure under Xcode 26.2 (`sending 'slot' risks causing data races`). The manual iOS
+job now matches Leafellow's verified macos-26 / Xcode 26.6 toolchain rather than
+patching third-party sources or suppressing concurrency diagnostics. The existing
+iPhone17/iOS26.2 simulator pin is preserved: that runtime was read back on the
+passing sibling runner. A config regression test protects the toolchain selection;
+only a successful hosted compile/runtime run establishes actual compatibility.
+
 Joey explicitly chose **internal testing first**. Public distribution remains
 blocked on useful rights-cleared native content and policy readiness. The native
 three-word synthetic sample is not a finished public product. Configuration green,

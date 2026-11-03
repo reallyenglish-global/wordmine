@@ -4,6 +4,16 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { parse } from 'yaml';
+
+// Expo 58's Swift JSI sources fail with the older 26.2 compiler; match the
+// toolchain verified by the sibling app, without weakening compiler diagnostics.
+test('iOS native job selects the verified Expo 58 Xcode toolchain', () => {
+  const workflow = parse(readFileSync('.github/workflows/ci.yml', 'utf8'));
+  const job = workflow.jobs['native-ios-simulator'];
+  assert.equal(job['runs-on'], 'macos-26');
+  assert.equal(job.env.DEVELOPER_DIR, '/Applications/Xcode_26.6.app/Contents/Developer');
+});
 
 // These are shell control-flow tests with fake tools, NOT native runtime tests.
 test('startup readiness handles only the observed external launcher dialog with one bounded retry', () => {

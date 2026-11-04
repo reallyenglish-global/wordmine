@@ -147,7 +147,64 @@ test('English policy has pinned full Unicode folding but preserves accents/inter
   for (const [input,expected] of [[' HARBOR ','harbor'],['Straße','strasse'],['ΟΣ','οσ'],['ﬀ','ff'],['e\u0301','é'],['\u0085HARBOR\u0085','harbor'],['\ufeffA','\ufeffa']])
     assert.equal(normalizeSpelling(input), expected);
   const cards = readPackage(fixture()).cards;
-  assert.deepEqual(evaluate(cards[1], ' HARBOUR '), {accepted:true,correct:true});
+  assert.deepEqual(evaluate(cards[1], ' HARBOUR '), {accepted:true,correct:true})
+// --- Characterisation tests for normalizeSpelling / evaluate boundary ---
+// These tests document the current normalizeSpelling/evaluate contract
+// and provide regression coverage. Do not remove or weaken.
+
+test('normalizeSpelling handles empty and whitespace-only input', () => {
+  assert.equal(normalizeSpelling(''), '');
+  assert.equal(normalizeSpelling('   '), '');
+  assert.equal(normalizeSpelling('\t\n'), '');
+});
+
+test('normalizeSpelling preserves accents and internal spacing', () => {
+  assert.equal(normalizeSpelling(' HARBOR '), 'harbor');
+  assert.equal(normalizeSpelling('  hello   world  '), 'hello   world');
+  assert.equal(normalizeSpelling('Straße'), 'strasse');
+  assert.equal(normalizeSpelling('ΟΣ'), 'οσ');
+});
+
+test('normalizeSpelling folds ligature and special unicode', () => {
+  assert.equal(normalizeSpelling('ﬀ'), 'ff');
+  assert.equal(normalizeSpelling('e\u0301'), 'é');
+  assert.equal(normalizeSpelling('\u0085HARBOR\u0085'), 'harbor');
+  assert.equal(normalizeSpelling('\ufeffA'), '\ufeffa');
+});
+
+test('evaluate meaning-from-definition path rejects missing choices', () => {
+  const card: PackageCard = {
+    id:'test', senseId:'s1', word:'test', prompt:'definition',
+    kind:'meaning-from-definition', choices:[{id:'c1',label:'choice1'}], answer:'c1'
+  };
+  // correct match
+  assert.deepEqual(evaluate(card, 'c1'), {accepted:true, correct:true});
+  // wrong choice id
+  assert.deepEqual(evaluate(card, 'c99'), {accepted:false, correct:false});
+  // empty answer
+  assert.deepEqual(evaluate(card, ''), {accepted:false, correct:false});
+});
+
+test('evaluate spelling path with long answer is rejected', () => {
+  const card: PackageCard = {
+    id:'test', senseId:'s1', word:'test', prompt:'definition',
+    kind:'spelling-definition', choices:[], answer:'test'
+  };
+  assert.deepEqual(evaluate(card, 'x'.repeat(16385)), {accepted:false, correct:false});
+  assert.deepEqual(evaluate(card, 'x'.repeat(16384)), {accepted:true, correct:true});
+});
+
+test('evaluate accepts correct spelling after normalization', () => {
+  const card: PackageCard = {
+    id:'test', senseId:'s1', word:'test', prompt:'definition',
+    kind:'spelling-definition', choices:[], answer:'test'
+  };
+  assert.deepEqual(evaluate(card, ' HARBOUR '), {accepted:true, correct:true});
+  assert.deepEqual(evaluate(card, 'hárbor'), {accepted:true, correct:false});
+  assert.deepEqual(evaluate(card, 'har bor'), {accepted:true, correct:false});
+  assert.deepEqual(evaluate(card, '   '), {accepted:false, correct:false});
+});
+;
   assert.deepEqual(evaluate(cards[1], 'hárbor'), {accepted:true,correct:false});
   assert.deepEqual(evaluate(cards[1], 'har bor'), {accepted:true,correct:false});
   assert.deepEqual(evaluate(cards[1], '   '), {accepted:false,correct:false});

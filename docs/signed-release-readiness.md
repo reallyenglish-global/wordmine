@@ -1,5 +1,22 @@
 # Android signed release readiness
 
+## pnpm integration candidate
+
+PR #15 reconciles the pnpm migration with main `261c16457653943ed0014de113a3b7a54350f68d`.
+Use pinned pnpm 10.29.3 and `pnpm-lock.yaml` for current setup; npm commands and
+the separate-migration status below are historical observations, not current
+instructions for this candidate. The glob/minimatch security overrides now live
+under `pnpm.overrides`. All four workflows use frozen pnpm installs; the permanent
+unsigned/release build jobs retain disabled lifecycle scripts, SHA-pinned actions,
+and their audit/security checks. The separate protected signing job still runs no
+package manager, Expo or Gradle and has no dependency cache.
+
+The candidate aligns Expo to `~58.0.23`, Metro runtime to `~58.0.17` and safe-area
+context to `~5.11.1`. Local compatibility, type/unit/contract/security, web/browser
+and Android/iOS Hermes-export checks do not establish a native build or device
+acceptance. Exact-head hosted native checks and independent review remain merge
+gates; signed builds, Play uploads and release approval remain separate actions.
+
 ### Credential-free native verification before any signing approval
 
 `android-store-candidate.yml` runs on PRs/manual dispatch and builds the permanent

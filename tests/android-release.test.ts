@@ -55,9 +55,9 @@ test('signed release workflow is manual, human-gated, main-only and never upload
     assert.equal(job.if, "github.ref == 'refs/heads/main'");
     for (const step of job.steps) if (step.uses) assert.match(step.uses, /@[0-9a-f]{40}$/);
   }
-  assert.ok(build.steps.some((step: { run?: string }) => step.run === 'npm ci --ignore-scripts'));
+  assert.ok(build.steps.some((step: { run?: string }) => step.run === 'pnpm install --frozen-lockfile --ignore-scripts'));
   assert.ok(signing.steps.some((step: { uses?: string }) => step.uses?.startsWith('actions/download-artifact@')));
-  assert.ok(!signing.steps.some((step: { run?: string; uses?: string }) => /npm |gradlew|expo prebuild/.test(step.run ?? '') || /gradle\//.test(step.uses ?? '')));
+  assert.ok(!signing.steps.some((step: { run?: string; uses?: string }) => /\b(?:npm|pnpm|npx)\b|gradlew|expo prebuild/.test(step.run ?? '') || /(?:gradle\/|pnpm\/)/.test(step.uses ?? '')));
   assert.ok(signing.steps.filter((step: { env?: object }) => step.env).length === 1);
   assert.match(text, /workflow_dispatch:/);
   assert.match(text, /if: github.ref == 'refs\/heads\/main'/);

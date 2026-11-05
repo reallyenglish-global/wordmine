@@ -23,15 +23,17 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm run contract:check
-      - run: npm audit --audit-level=low
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run typecheck
+      - run: pnpm test
+      - run: pnpm run contract:check
+      - run: pnpm exec expo install --check
+      - run: pnpm audit --audit-level=low
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -44,15 +46,16 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npm run build:web
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm run build:web
       - name: Exercise study, persistence and offline reload in Chromium
-        run: npm run test:browser
+        run: pnpm run test:browser
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -67,13 +70,14 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - name: Check Android and iOS production JS and Hermes bundling (not device tests)
-        run: npx expo export --platform android --platform ios --output-dir dist-native
+        run: pnpm exec expo export --platform android --platform ios --output-dir dist-native
         env:
           CI: '1'
 
@@ -87,10 +91,11 @@ jobs:
       CI: '1'
     steps:
       - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
-          cache: npm
+          cache: pnpm
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -99,9 +104,9 @@ jobs:
         with:
           packages: platform-tools build-tools;35.0.0
       - uses: gradle/actions/setup-gradle@v4
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
       - name: Generate Android project from Expo config
-        run: npx expo prebuild --platform android --no-install
+        run: pnpm exec expo prebuild --platform android --no-install
       - name: Compile non-debug preview APK (prototype identity; not store-signed)
         working-directory: android
         run: ./gradlew :app:assembleRelease --no-daemon
@@ -132,10 +137,11 @@ jobs:
     timeout-minutes: 50
     steps:
       - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
-          cache: npm
+          cache: pnpm
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -144,9 +150,9 @@ jobs:
         with:
           packages: platform-tools build-tools;35.0.0
       - uses: gradle/actions/setup-gradle@v4
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
       - name: Generate Android project from Expo config
-        run: npx expo prebuild --platform android --no-install
+        run: pnpm exec expo prebuild --platform android --no-install
         env:
           CI: '1'
       - name: Compile prototype APK (not a release)
@@ -221,16 +227,17 @@ jobs:
       MAESTRO_CLI_NO_ANALYTICS: '1'
     steps:
       - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
-          cache: npm
+          cache: pnpm
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-      - run: npm ci
-      - run: npx expo prebuild --platform ios --no-install
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec expo prebuild --platform ios --no-install
       - name: Install simulator Pods
         working-directory: ios
         run: pod install

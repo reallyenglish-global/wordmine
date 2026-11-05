@@ -37,22 +37,22 @@ Closed structures deliberately catch typos and learner-data leakage. Additions n
 
 ## Static validators and native acceptance
 
-The app imports `src/package/validators.generated.ts`, not the Ajv compiler. Generate/review these functions at build time with `npx tsx scripts/generate-package-validators.ts`; `--check` rejects stale output. Default unit tests rerun the full package/evaluator/session corpus with string code generation disabled, and browser tests exercise practice under a no-`unsafe-eval` CSP with an external-script negative control. Schema and semantic rules are unchanged. Ajv's static helper modules remain runtime dependencies; inline bootstrap/styles are allowed by the test policy, so this is not a full CSP hardening claim.
+The app imports `src/package/validators.generated.ts`, not the Ajv compiler. Generate/review these functions at build time with `pnpm exec tsx scripts/generate-package-validators.ts`; `--check` rejects stale output. Default unit tests rerun the full package/evaluator/session corpus with string code generation disabled, and browser tests exercise practice under a no-`unsafe-eval` CSP with an external-script negative control. Schema and semantic rules are unchanged. Ajv's static helper modules remain runtime dependencies; inline bootstrap/styles are allowed by the test policy, so this is not a full CSP hardening claim.
 
 The existing manually dispatched native acceptance scripts run `.maestro/study.yaml`, which now includes `.maestro/package.yaml` after the original flow. The package flow checks recognition, alternate spelling, cold relaunch, rejected candidates and original-state isolation. Host YAML/control-flow tests are not an emulator result; acceptance evidence must pin the actual hosted run/head and distinguish real runtime failures from skipped jobs.
 
 ## Verification
 
 ```sh
-npm run typecheck
-npm test
-npm run contract:check
-npx tsx scripts/bundle-package.ts --check
-npm run build:web
-npm run test:browser
+pnpm run typecheck
+pnpm test
+pnpm run contract:check
+pnpm exec tsx scripts/bundle-package.ts --check
+pnpm run build:web
+pnpm run test:browser
 ```
 
-The test suite compares generated bundled source bytes to the checked-in fixture; changing payloads requires recalculating the manifest and regenerating with `npx tsx scripts/bundle-package.ts`. Optional table reproducibility: `python3 scripts/generate-casefold.py --check`.
+The test suite compares generated bundled source bytes to the checked-in fixture; changing payloads requires recalculating the manifest and regenerating with `pnpm exec tsx scripts/bundle-package.ts`. Optional table reproducibility: `python3 scripts/generate-casefold.py --check`.
 
 The bundled/native preview displays the first list, supports recognition/spelling, locks first answers, and preserves its own content-pinned local session; denied storage is visibly temporary. The web-only synthetic prototype can fetch this fixture from a same-origin manifest, validate all declared files, and store an explicit user-requested download in IndexedDB. Browser fetches default to the app's origin; a publisher/CDN origin must be explicitly allowlisted in code. Requests omit credentials and referrers, and there is no user-entered URL. Reopening revalidates the bytes. The PWA service worker caches only the app shell; it does not cache the sample package or any API/account responses. Learning progress remains a separate device-local session and is not synchronized.
 

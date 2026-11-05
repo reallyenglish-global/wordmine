@@ -31,9 +31,10 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
-      - run: npm ci --ignore-scripts
-      - run: npm audit --audit-level=low
-      - run: npm run typecheck && npm test && npm run contract:check
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm audit --audit-level=low
+      - run: pnpm run typecheck && pnpm test && pnpm run contract:check
       - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           distribution: temurin
@@ -50,7 +51,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
       - name: Generate permanent-identity release project and remove template debug signing
         run: |
-          npx expo prebuild --platform android --no-install
+          pnpm exec expo prebuild --platform android --no-install
           node scripts/strip-debug-release-signing.mjs android/app/build.gradle
       - name: Compile release APK and AAB without template signing
         working-directory: android

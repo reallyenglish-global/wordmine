@@ -4,20 +4,24 @@ import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createRequire } from 'node:module';
+import { parse } from 'yaml';
 
 const require = createRequire(import.meta.url);
 const xcode = require('xcode');
 
 test('locked Expo config plugin uses its upstream Xcode dependency without vulnerable uuid', () => {
-  const { packages } = JSON.parse(readFileSync('package-lock.json', 'utf8'));
-  const plugin = packages['node_modules/@expo/config-plugins'];
-  // Use the upstream-compatible SDK 57 patch, not a forced xcode/uuid override.
-  assert.equal(plugin.dependencies.xcode, '^4.0.0');
-  assert.equal(packages['node_modules/xcode'].dependencies.uuid, undefined);
-  for (const [path, entry] of Object.entries(packages) as [string, { version: string }][]) {
-    if (!path.endsWith('/uuid')) continue;
-    const [major, minor, patch] = entry.version.split('.').map(Number);
-    assert.ok(major > 11 || (major === 11 && (minor > 1 || (minor === 1 && patch >= 1))), `${path}@${entry.version} is below fixed uuid 11.1.1`);
+  const { snapshots } = parse(readFileSync('pnpm-lock.yaml', 'utf8'));
+  const plugins = Object.keys(snapshots).filter(key => key.startsWith('@expo/config-plugins@'));
+  const xcodes = Object.keys(snapshots).filter(key => key.startsWith('xcode@'));
+  const uuids = Object.keys(snapshots).filter(key => key.startsWith('uuid@'));
+  assert.ok(plugins.length && xcodes.length, 'expected locked native dependencies');
+  // Use the upstream-compatible Expo dependency, not a forced xcode/uuid override.
+  for (const key of plugins) assert.match(snapshots[key].dependencies.xcode, /^4\./);
+  for (const key of xcodes) assert.equal(snapshots[key].dependencies.uuid, undefined);
+  for (const key of uuids) {
+    const version = key.slice('uuid@'.length).split('(')[0];
+    const [major, minor, patch] = version.split('.').map(Number);
+    assert.ok(major > 11 || (major === 11 && (minor > 1 || (minor === 1 && patch >= 1))), `${key} is below fixed uuid 11.1.1`);
   }
 });
 

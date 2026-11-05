@@ -22,14 +22,15 @@ jobs:
       WORDMINE_ANDROID_VERSION_CODE: ${{ github.run_number }}
     steps:
       - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm run contract:check
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run typecheck
+      - run: pnpm test
+      - run: pnpm run contract:check
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -39,7 +40,7 @@ jobs:
           packages: platform-tools build-tools;36.0.0
       - uses: gradle/actions/setup-gradle@v4
       - name: Generate prototype Android project with explicit run-scoped version code
-        run: npx expo prebuild --platform android --no-install
+        run: pnpm exec expo prebuild --platform android --no-install
       - name: Remove only Expo's default debug key from the generated release variant
         run: node scripts/strip-debug-release-signing.mjs android/app/build.gradle
       - name: Build unsigned prototype AAB (not for distribution)

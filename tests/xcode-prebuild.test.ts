@@ -15,7 +15,7 @@ test('locked Expo config plugin uses its upstream Xcode dependency without vulne
   const xcodes = Object.keys(snapshots).filter(key => key.startsWith('xcode@'));
   const uuids = Object.keys(snapshots).filter(key => key.startsWith('uuid@'));
   assert.ok(plugins.length && xcodes.length, 'expected locked native dependencies');
-  // Use the upstream-compatible SDK 57 patch, not a forced xcode/uuid override.
+  // Use the upstream-compatible Expo dependency, not a forced xcode/uuid override.
   for (const key of plugins) assert.match(snapshots[key].dependencies.xcode, /^4\./);
   for (const key of xcodes) assert.equal(snapshots[key].dependencies.uuid, undefined);
   for (const key of uuids) {

@@ -44,3 +44,7 @@ yarn-error.*
 # Browser acceptance artifacts
 test-results/
 playwright-report/
+
+# Python signing-verifier test bytecode
+__pycache__/
+*.py[cod]
